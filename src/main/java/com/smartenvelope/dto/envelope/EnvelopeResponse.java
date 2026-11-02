@@ -7,3 +7,4 @@ package com.smartenvelope.dto.envelope;
 public class EnvelopeResponse {
     // TODO: Thành viên 2 khai báo id, name, categoryName, allocatedAmount, spentAmount, remainingAmount, percentSpent
 }
+

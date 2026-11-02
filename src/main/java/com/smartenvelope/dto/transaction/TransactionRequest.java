@@ -7,3 +7,4 @@ package com.smartenvelope.dto.transaction;
 public class TransactionRequest {
     // TODO: Thành viên 3 khai báo accountId, envelopeId, categoryId, amount, type, transactionDate, note và validation
 }
+

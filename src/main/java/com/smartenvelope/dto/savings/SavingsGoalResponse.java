@@ -7,3 +7,4 @@ package com.smartenvelope.dto.savings;
 public class SavingsGoalResponse {
     // TODO: Thành viên 4 khai báo id, name, targetAmount, currentAmount, progressPercent, remainingDays
 }
+

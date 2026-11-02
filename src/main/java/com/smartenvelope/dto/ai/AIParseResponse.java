@@ -7,3 +7,4 @@ package com.smartenvelope.dto.ai;
 public class AIParseResponse {
     // TODO: Thành viên 5 khai báo suggestedAmount, suggestedCategory, suggestedType, note, confidence
 }
+

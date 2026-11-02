@@ -8,3 +8,4 @@ package com.smartenvelope.dto.ai;
 public class AIParseRequest {
     // TODO: Thành viên 5 khai báo rawPrompt/textInput
 }
+

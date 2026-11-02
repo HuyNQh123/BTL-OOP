@@ -9,3 +9,4 @@ public enum AccountType {
     BANK,
     E_WALLET
 }
+

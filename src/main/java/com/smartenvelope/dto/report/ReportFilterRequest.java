@@ -9,3 +9,4 @@ import java.time.LocalDate;
 public class ReportFilterRequest {
     // TODO: Thành viên 5 khai báo startDate, endDate, transactionType, categoryId
 }
+

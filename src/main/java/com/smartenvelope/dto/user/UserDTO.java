@@ -7,3 +7,4 @@ package com.smartenvelope.dto.user;
 public class UserDTO {
     // TODO: Thành viên 1 khai báo id, fullName, email, role, enabled, locked, createdAt
 }
+

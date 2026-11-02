@@ -69,3 +69,4 @@ git add .
 git commit -m "chore: resolve merge conflicts with develop"
 git push origin feature/memberX-feature-name
 ```
+

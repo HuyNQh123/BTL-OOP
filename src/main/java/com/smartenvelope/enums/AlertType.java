@@ -9,3 +9,4 @@ public enum AlertType {
     NEAR_LIMIT,
     REMINDER
 }
+

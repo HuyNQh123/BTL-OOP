@@ -7,3 +7,4 @@ package com.smartenvelope.dto.savings;
 public class SavingsGoalRequest {
     // TODO: Thành viên 4 khai báo name, targetAmount, initialAmount, deadline và validation
 }
+

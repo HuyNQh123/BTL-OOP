@@ -75,3 +75,4 @@ Dự án áp dụng mô hình kiến trúc **Spring Boot MVC đa tầng (Layered
 - `application.properties`: Cấu hình datasource, JPA, Thymeleaf, server port.
 - `static/`: Chứa file tĩnh dùng chung (`css/`, `js/`, `images/`).
 - `templates/`: Chứa các template HTML Thymeleaf, được tổ chức theo module tương ứng với controller.
+

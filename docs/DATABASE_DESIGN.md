@@ -119,3 +119,4 @@ Tài liệu này là khung thiết kế cơ sở dữ liệu (Database Design & 
 ## 4. Kế hoạch hoàn thiện
 - [ ] Nhóm họp thống nhất quan hệ Foreign Keys và On Delete (Cascade / Set Null).
 - [ ] Bổ sung script SQL DDL chi tiết vào thư mục này khi hoàn thiện.
+

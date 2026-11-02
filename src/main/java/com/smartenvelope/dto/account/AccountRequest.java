@@ -7,3 +7,4 @@ package com.smartenvelope.dto.account;
 public class AccountRequest {
     // TODO: Thành viên 2 khai báo name, type, initialBalance và validation
 }
+

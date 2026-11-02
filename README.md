@@ -153,3 +153,4 @@ SmartEnvelope/
 - Commit có ý nghĩa: `feat(...)`, `fix(...)`, `docs(...)`.
 - Tạo Pull Request hướng tới nhánh **`develop`** (không tạo vào `main`).
 - Ít nhất 1 thành viên review và approve trước khi merge.
+

@@ -12,3 +12,4 @@ import org.springframework.stereotype.Repository;
 public interface UserRepository extends JpaRepository<User, Long> {
     // TODO: Thành viên 1 định nghĩa các query methods (findByEmail, existsByEmail...)
 }
+

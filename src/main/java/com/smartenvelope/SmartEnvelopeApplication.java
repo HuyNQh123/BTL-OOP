@@ -15,3 +15,4 @@ public class SmartEnvelopeApplication {
         SpringApplication.run(SmartEnvelopeApplication.class, args);
     }
 }
+

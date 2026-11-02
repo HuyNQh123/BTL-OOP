@@ -7,3 +7,4 @@ package com.smartenvelope.dto.envelope;
 public class EnvelopeRequest {
     // TODO: Thành viên 2 khai báo budgetPeriodId, categoryId, name, allocatedAmount và validation
 }
+

@@ -10,3 +10,4 @@ import org.springframework.stereotype.Service;
 public class AIService {
     // TODO: Thành viên 5 triển khai tích hợp AI (ví dụ: Google Gemini API)
 }
+

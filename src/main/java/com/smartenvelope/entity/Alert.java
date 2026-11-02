@@ -24,3 +24,4 @@ public class Alert {
         this.id = id;
     }
 }
+

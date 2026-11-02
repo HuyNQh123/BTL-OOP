@@ -7,3 +7,4 @@ package com.smartenvelope.dto.report;
 public class ReportSummaryResponse {
     // TODO: Thành viên 5 khai báo totalIncome, totalExpense, netSavings, categoryBreakdowns
 }
+

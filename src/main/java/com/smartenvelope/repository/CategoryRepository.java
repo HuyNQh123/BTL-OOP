@@ -12,3 +12,4 @@ import org.springframework.stereotype.Repository;
 public interface CategoryRepository extends JpaRepository<Category, Long> {
     // TODO: Thành viên 3 định nghĩa các query methods (findByType, findByActiveTrue...)
 }
+

@@ -12,3 +12,4 @@ import org.springframework.stereotype.Repository;
 public interface EnvelopeRepository extends JpaRepository<Envelope, Long> {
     // TODO: Thành viên 2 định nghĩa các query methods (findByBudgetPeriodId...)
 }
+

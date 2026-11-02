@@ -7,3 +7,4 @@ package com.smartenvelope.dto.auth;
 public class RegisterRequest {
     // TODO: Thành viên 1 khai báo fullName, email, password, confirmPassword và validation
 }
+

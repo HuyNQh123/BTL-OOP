@@ -12,3 +12,4 @@ import org.springframework.web.bind.annotation.RestController;
 public class AIController {
     // TODO: Thành viên 5 khai báo các API endpoint kết nối AI
 }
+

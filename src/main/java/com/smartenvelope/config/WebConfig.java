@@ -12,3 +12,4 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
     // TODO: Thành viên 1 bổ sung các cấu hình Web MVC khi cần thiết
 }
+

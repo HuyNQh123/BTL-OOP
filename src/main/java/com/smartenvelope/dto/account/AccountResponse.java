@@ -7,3 +7,4 @@ package com.smartenvelope.dto.account;
 public class AccountResponse {
     // TODO: Thành viên 2 khai báo id, name, type, balance, createdAt
 }
+

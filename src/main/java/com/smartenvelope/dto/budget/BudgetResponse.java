@@ -7,3 +7,4 @@ package com.smartenvelope.dto.budget;
 public class BudgetResponse {
     // TODO: Thành viên 4 khai báo id, name, totalBudget, allocatedBudget, remainingBudget
 }
+

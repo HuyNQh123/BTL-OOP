@@ -7,3 +7,4 @@ package com.smartenvelope.dto.budget;
 public class BudgetRequest {
     // TODO: Thành viên 4 khai báo name, totalBudget, ruleType và validation
 }
+

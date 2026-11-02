@@ -24,3 +24,4 @@ public class SavingsGoal {
         this.id = id;
     }
 }
+

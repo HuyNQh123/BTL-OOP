@@ -12,3 +12,4 @@ import org.springframework.stereotype.Repository;
 public interface BudgetPeriodRepository extends JpaRepository<BudgetPeriod, Long> {
     // TODO: Thành viên 2 định nghĩa các query methods (findByUserId...)
 }
+

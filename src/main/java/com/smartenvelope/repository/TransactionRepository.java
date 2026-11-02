@@ -12,3 +12,4 @@ import org.springframework.stereotype.Repository;
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
     // TODO: Thành viên 3 định nghĩa các query methods (findByUserId, findByAccountId, findByEnvelopeId...)
 }
+

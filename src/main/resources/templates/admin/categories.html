@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- Giao diện Quản lý danh mục dùng chung - Admin (Phụ trách bởi: Thành viên 1) -->
+<head th:replace="~{fragments/header :: header('Quản lý danh mục')}">
+</head>
+<body>
+<div class="d-flex">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <main class="flex-grow-1 p-4">
+        <h2>Quản lý Danh Mục Hệ Thống</h2>
+        <p class="text-muted">Danh sách các danh mục thu, chi mặc định.</p>
+        <!-- TODO: Thành viên 1 hoàn thiện danh sách và chức năng thêm/sửa/ẩn danh mục -->
+        <div class="card shadow-sm border-0 mt-4">
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tên danh mục</th>
+                            <th>Phân loại</th>
+                            <th>Biểu tượng</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">Chưa có danh mục hiển thị.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

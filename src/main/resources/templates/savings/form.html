@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- Giao diện Tạo mới / Cập nhật mục tiêu tiết kiệm (Phụ trách bởi: Thành viên 4) -->
+<head th:replace="~{fragments/header :: header('Tạo mục tiêu tiết kiệm')}">
+</head>
+<body>
+<div class="d-flex">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <main class="flex-grow-1 p-4">
+        <h2>Tạo Mục Tiêu Tiết Kiệm</h2>
+        <!-- TODO: Thành viên 4 thiết kế form nhập tên mục tiêu, số tiền kỳ vọng, hạn chót -->
+        <div class="card shadow-sm border-0 p-4 mt-3" style="max-width: 600px;">
+            <form>
+                <div class="mb-3">
+                    <label class="form-label">Tên mục tiêu</label>
+                    <input type="text" class="form-control" placeholder="Ví dụ: Mua laptop mới, Quỹ khẩn cấp...">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Số tiền mục tiêu (VNĐ)</label>
+                    <input type="number" class="form-control" placeholder="0">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Số tiền gửi ban đầu</label>
+                    <input type="number" class="form-control" placeholder="0">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Hạn chót dự kiến</label>
+                    <input type="date" class="form-control">
+                </div>
+                <button type="button" class="btn btn-primary">Lưu Mục Tiêu</button>
+                <a th:href="@{/savings}" class="btn btn-secondary ms-2">Hủy</a>
+            </form>
+        </div>
+    </main>
+</div>
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

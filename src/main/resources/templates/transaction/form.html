@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- Giao diện Ghi nhận giao dịch mới (Phụ trách bởi: Thành viên 3) -->
+<head th:replace="~{fragments/header :: header('Giao dịch mới')}">
+</head>
+<body>
+<div class="d-flex">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <main class="flex-grow-1 p-4">
+        <h2>Ghi Nhận Giao Dịch</h2>
+        <!-- TODO: Thành viên 3 thiết kế form nhập số tiền, chọn loại giao dịch, tài khoản và phong bì -->
+        <div class="card shadow-sm border-0 p-4 mt-3" style="max-width: 600px;">
+            <form>
+                <div class="mb-3">
+                    <label class="form-label">Loại giao dịch</label>
+                    <select class="form-select">
+                        <option value="EXPENSE">Chi tiêu</option>
+                        <option value="INCOME">Thu nhập</option>
+                        <option value="TRANSFER">Chuyển tiền</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Số tiền (VNĐ)</label>
+                    <input type="number" class="form-control" placeholder="0">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Tài khoản thanh toán</label>
+                    <select class="form-select">
+                        <option value="">-- Chọn tài khoản --</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Phong bì khấu trừ</label>
+                    <select class="form-select">
+                        <option value="">-- Chọn phong bì --</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Ghi chú</label>
+                    <textarea class="form-control" rows="2" placeholder="Nội dung chi tiêu..."></textarea>
+                </div>
+                <button type="button" class="btn btn-primary">Lưu Giao Dịch</button>
+                <a th:href="@{/transactions}" class="btn btn-secondary ms-2">Hủy</a>
+            </form>
+        </div>
+    </main>
+</div>
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

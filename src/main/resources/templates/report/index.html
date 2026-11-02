@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- Giao diện Báo cáo thống kê tài chính (Phụ trách bởi: Thành viên 5) -->
+<head th:replace="~{fragments/header :: header('Báo cáo thống kê')}">
+</head>
+<body>
+<div class="d-flex">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <main class="flex-grow-1 p-4">
+        <h2>Báo Cáo & Phân Tích Tài Chính</h2>
+        <p class="text-muted">Biểu đồ cơ cấu chi tiêu theo danh mục và so sánh thu chi theo thời gian.</p>
+        <!-- TODO: Thành viên 5 tích hợp thư viện biểu đồ (Chart.js) và bộ lọc theo tháng -->
+        <div class="card shadow-sm border-0 p-4 mt-3">
+            <p class="text-muted mb-0">Biểu đồ thống kê sẽ được hiển thị tại đây.</p>
+        </div>
+    </main>
+</div>
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

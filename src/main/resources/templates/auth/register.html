@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- Giao diện Đăng ký tài khoản (Phụ trách bởi: Thành viên 1) -->
+<head th:replace="~{fragments/header :: header('Đăng ký tài khoản')}">
+</head>
+<body class="bg-light d-flex align-items-center py-4 min-vh-100">
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <h3 class="card-title text-center fw-bold mb-4">Đăng Ký Tài Khoản</h3>
+                    <!-- TODO: Thành viên 1 hoàn thiện form đăng ký và validation -->
+                    <form th:action="@{/auth/register}" method="post">
+                        <div class="mb-3">
+                            <label for="fullName" class="form-label">Họ và tên</label>
+                            <input type="text" id="fullName" name="fullName" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" id="email" name="email" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Mật khẩu</label>
+                            <input type="password" id="password" name="password" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirmPassword" class="form-label">Xác nhận mật khẩu</label>
+                            <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">Tạo Tài Khoản</button>
+                    </form>
+                    <div class="text-center mt-3">
+                        <a th:href="@{/auth/login}">Đã có tài khoản? Đăng nhập tại đây</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

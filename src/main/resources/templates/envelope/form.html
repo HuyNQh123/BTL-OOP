@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- Giao diện Tạo mới / Chỉnh sửa phong bì ngân sách (Phụ trách bởi: Thành viên 2) -->
+<head th:replace="~{fragments/header :: header('Thiết lập phong bì')}">
+</head>
+<body>
+<div class="d-flex">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <main class="flex-grow-1 p-4">
+        <h2>Tạo / Sửa Phong Bì Ngân Sách</h2>
+        <!-- TODO: Thành viên 2 thiết kế form chọn danh mục, đặt tên phong bì và số tiền phân bổ -->
+        <div class="card shadow-sm border-0 p-4 mt-3" style="max-width: 600px;">
+            <form>
+                <div class="mb-3">
+                    <label class="form-label">Tên phong bì</label>
+                    <input type="text" class="form-control" placeholder="Ví dụ: Tiền ăn cả tháng, Xăng xe...">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Danh mục liên kết</label>
+                    <select class="form-select">
+                        <option value="">-- Chọn danh mục --</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Hạn mức ngân sách (Số tiền phân bổ)</label>
+                    <input type="number" class="form-control" placeholder="0">
+                </div>
+                <button type="button" class="btn btn-primary">Lưu Phong Bì</button>
+                <a th:href="@{/envelopes}" class="btn btn-secondary ms-2">Hủy</a>
+            </form>
+        </div>
+    </main>
+</div>
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

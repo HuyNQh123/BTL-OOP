@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- Giao diện Thiết lập ngân sách (Phụ trách bởi: Thành viên 4) -->
+<head th:replace="~{fragments/header :: header('Thiết lập ngân sách')}">
+</head>
+<body>
+<div class="d-flex">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <main class="flex-grow-1 p-4">
+        <h2>Thiết Lập Ngân Sách & Quy Tắc</h2>
+        <!-- TODO: Thành viên 4 thiết kế form nhập ngân sách tổng và chọn quy tắc tài chính -->
+        <div class="card shadow-sm border-0 p-4 mt-3" style="max-width: 600px;">
+            <form>
+                <div class="mb-3">
+                    <label class="form-label">Tên kế hoạch ngân sách</label>
+                    <input type="text" class="form-control" placeholder="Ví dụ: Ngân sách tháng 11">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Tổng ngân sách dự kiến (VNĐ)</label>
+                    <input type="number" class="form-control" placeholder="0">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Quy tắc áp dụng</label>
+                    <select class="form-select">
+                        <option value="50_30_20">Quy tắc 50/30/20 (Nhu cầu / Mong muốn / Tiết kiệm)</option>
+                        <option value="CUSTOM">Tự do phân bổ theo phong bì</option>
+                    </select>
+                </div>
+                <button type="button" class="btn btn-primary">Lưu Kế Hoạch</button>
+                <a th:href="@{/budgets}" class="btn btn-secondary ms-2">Hủy</a>
+            </form>
+        </div>
+    </main>
+</div>
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

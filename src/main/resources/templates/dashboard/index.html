@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- Giao diện Bảng điều khiển (Dashboard) - Phụ trách bởi: Thành viên 5 -->
+<head th:replace="~{fragments/header :: header('Bảng điều khiển')}">
+</head>
+<body>
+<div class="d-flex">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <main class="flex-grow-1 p-4">
+        <h2>Bảng Điều Khiển Tài Chính</h2>
+        <p class="text-muted">Tổng quan tình hình tài chính và trạng thái các phong bì chi tiêu.</p>
+        <!-- TODO: Thành viên 5 triển khai các thẻ thống kê tổng quan và biểu đồ -->
+        <div class="row g-4 mt-2">
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 p-3 bg-primary text-white">
+                    <h5>Tổng Số Dư</h5>
+                    <h3>0 đ</h3>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 p-3 bg-success text-white">
+                    <h5>Tổng Thu Tháng Này</h5>
+                    <h3>0 đ</h3>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 p-3 bg-danger text-white">
+                    <h5>Tổng Chi Tháng Này</h5>
+                    <h3>0 đ</h3>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

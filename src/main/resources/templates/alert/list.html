@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- Giao diện Danh sách cảnh báo và thông báo (Phụ trách bởi: Thành viên 4) -->
+<head th:replace="~{fragments/header :: header('Cảnh báo & Thông báo')}">
+</head>
+<body>
+<div class="d-flex">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <main class="flex-grow-1 p-4">
+        <h2>Cảnh Báo & Thông Báo</h2>
+        <p class="text-muted">Các cảnh báo vượt ngân sách, sắp cạn tiền phong bì hoặc nhắc nhở định kỳ.</p>
+        <!-- TODO: Thành viên 4 hiển thị danh sách cảnh báo với các badge mức độ (DANGER, WARNING, INFO) -->
+        <div class="card shadow-sm border-0 p-4 mt-3">
+            <p class="text-muted mb-0">Hiện tại bạn không có cảnh báo nào.</p>
+        </div>
+    </main>
+</div>
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

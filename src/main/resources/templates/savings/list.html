@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- Giao diện Danh sách mục tiêu tiết kiệm và Heo đất (Phụ trách bởi: Thành viên 4) -->
+<head th:replace="~{fragments/header :: header('Mục tiêu tiết kiệm')}">
+</head>
+<body>
+<div class="d-flex">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <main class="flex-grow-1 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>Mục Tiêu Tiết Kiệm & Heo Đất</h2>
+            <a th:href="@{/savings/new}" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-1"></i> Tạo Mục Tiêu Mới
+            </a>
+        </div>
+        <p class="text-muted">Theo dõi tiến độ tích lũy tiền cho các mục tiêu dài hạn.</p>
+        <!-- TODO: Thành viên 4 hiển thị danh sách mục tiêu tiết kiệm và thanh tiến độ hoàn thành -->
+        <div class="card shadow-sm border-0 p-4 mt-3">
+            <p class="text-muted mb-0">Chưa có mục tiêu tiết kiệm nào được tạo.</p>
+        </div>
+    </main>
+</div>
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

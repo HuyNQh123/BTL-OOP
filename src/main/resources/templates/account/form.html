@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- Giao diện Thêm mới / Cập nhật tài khoản (Phụ trách bởi: Thành viên 2) -->
+<head th:replace="~{fragments/header :: header('Thông tin tài khoản')}">
+</head>
+<body>
+<div class="d-flex">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <main class="flex-grow-1 p-4">
+        <h2>Thêm / Cập Nhật Tài Khoản</h2>
+        <!-- TODO: Thành viên 2 thiết kế form nhập tên tài khoản, loại tài khoản, số dư ban đầu -->
+        <div class="card shadow-sm border-0 p-4 mt-3" style="max-width: 600px;">
+            <form>
+                <div class="mb-3">
+                    <label class="form-label">Tên tài khoản</label>
+                    <input type="text" class="form-control" placeholder="Ví dụ: Ví MoMo, Techcombank...">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Loại tài khoản</label>
+                    <select class="form-select">
+                        <option value="CASH">Tiền mặt</option>
+                        <option value="BANK">Tài khoản ngân hàng</option>
+                        <option value="E_WALLET">Ví điện tử</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Số dư ban đầu</label>
+                    <input type="number" class="form-control" placeholder="0">
+                </div>
+                <button type="button" class="btn btn-primary">Lưu Tài Khoản</button>
+                <a th:href="@{/accounts}" class="btn btn-secondary ms-2">Hủy</a>
+            </form>
+        </div>
+    </main>
+</div>
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- Giao diện Lịch sử giao dịch thu/chi (Phụ trách bởi: Thành viên 3) -->
+<head th:replace="~{fragments/header :: header('Lịch sử giao dịch')}">
+</head>
+<body>
+<div class="d-flex">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <main class="flex-grow-1 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>Lịch Sử Giao Dịch</h2>
+            <a th:href="@{/transactions/new}" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-1"></i> Ghi Giao Dịch Mới
+            </a>
+        </div>
+        <p class="text-muted">Theo dõi và lọc danh sách thu, chi và chuyển tiền.</p>
+        <!-- TODO: Thành viên 3 hiển thị bảng giao dịch có phân trang và bộ lọc -->
+        <div class="card shadow-sm border-0 p-4 mt-3">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Ngày</th>
+                        <th>Loại</th>
+                        <th>Danh mục</th>
+                        <th>Tài khoản</th>
+                        <th>Số tiền</th>
+                        <th>Ghi chú</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">Chưa có giao dịch nào được ghi nhận.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

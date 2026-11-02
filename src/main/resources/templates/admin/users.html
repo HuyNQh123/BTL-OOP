@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- Giao diện Quản lý người dùng - Admin (Phụ trách bởi: Thành viên 1) -->
+<head th:replace="~{fragments/header :: header('Quản lý người dùng')}">
+</head>
+<body>
+<div class="d-flex">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <main class="flex-grow-1 p-4">
+        <h2>Quản lý Người Dùng</h2>
+        <p class="text-muted">Danh sách tài khoản trong hệ thống SmartEnvelope.</p>
+        <!-- TODO: Thành viên 1 hoàn thiện bảng danh sách người dùng và nút khóa/mở khóa -->
+        <div class="card shadow-sm border-0 mt-4">
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Họ và tên</th>
+                            <th>Email</th>
+                            <th>Vai trò</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">Chưa có dữ liệu hiển thị.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <!-- Giao diện Kế hoạch ngân sách (Phụ trách bởi: Thành viên 4) -->
-<head th:replace="~{fragments/header :: header('Kế hoạch ngân sách')}">
+<head th:replace="~{fragments/resources :: head('Kế hoạch ngân sách')}">
 </head>
 <body>
 <div class="d-flex">
-    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <div th:replace="~{fragments/sidebar :: sidebar('budgets')}"></div>
     <main class="flex-grow-1 p-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h2>Kế Hoạch Ngân Sách</h2>
@@ -21,6 +21,7 @@
     </main>
 </div>
 <div th:replace="~{fragments/footer :: footer}"></div>
+<th:block th:replace="~{fragments/resources :: scripts}"></th:block>
 </body>
 </html>
 

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <!-- Giao diện Thêm mới / Cập nhật tài khoản (Phụ trách bởi: Thành viên 2) -->
-<head th:replace="~{fragments/header :: header('Thông tin tài khoản')}">
+<head th:replace="~{fragments/resources :: head('Thông tin tài khoản')}">
 </head>
 <body>
 <div class="d-flex">
-    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <div th:replace="~{fragments/sidebar :: sidebar('accounts')}"></div>
     <main class="flex-grow-1 p-4">
         <h2>Thêm / Cập Nhật Tài Khoản</h2>
         <!-- TODO: Thành viên 2 thiết kế form nhập tên tài khoản, loại tài khoản, số dư ban đầu -->
@@ -34,6 +34,7 @@
     </main>
 </div>
 <div th:replace="~{fragments/footer :: footer}"></div>
+<th:block th:replace="~{fragments/resources :: scripts}"></th:block>
 </body>
 </html>
 

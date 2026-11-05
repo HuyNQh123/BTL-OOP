@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <!-- Giao diện Tạo mới / Cập nhật mục tiêu tiết kiệm (Phụ trách bởi: Thành viên 4) -->
-<head th:replace="~{fragments/header :: header('Tạo mục tiêu tiết kiệm')}">
+<head th:replace="~{fragments/resources :: head('Tạo mục tiêu tiết kiệm')}">
 </head>
 <body>
 <div class="d-flex">
-    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <div th:replace="~{fragments/sidebar :: sidebar('savings')}"></div>
     <main class="flex-grow-1 p-4">
         <h2>Tạo Mục Tiêu Tiết Kiệm</h2>
         <!-- TODO: Thành viên 4 thiết kế form nhập tên mục tiêu, số tiền kỳ vọng, hạn chót -->
@@ -34,6 +34,7 @@
     </main>
 </div>
 <div th:replace="~{fragments/footer :: footer}"></div>
+<th:block th:replace="~{fragments/resources :: scripts}"></th:block>
 </body>
 </html>
 

@@ -36,7 +36,8 @@ public class SavingsGoalController {
     @GetMapping("/new")
     public String form(Model model) {
 
-        model.addAttribute("savingsGoalRequest", new SavingsGoalRequest());
+        model.addAttribute("savingsGoalRequest",
+                new SavingsGoalRequest(null, null, null, null));
 
         return "savings/form";
     }

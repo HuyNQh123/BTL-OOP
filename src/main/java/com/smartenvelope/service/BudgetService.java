@@ -16,8 +16,7 @@ import java.util.List;
 
 /**
  * Service xử lý nghiệp vụ ngân sách và quy tắc tài chính (ví dụ quy tắc
- * 50/30/20, thiết lập hạn mức tổng).
- * Phụ trách bởi: Thành viên 4.
+ * 50/30/20, thiết lập hạn mức tổng). Phụ trách bởi: Thành viên 4.
  */
 @Service
 @RequiredArgsConstructor
@@ -30,10 +29,9 @@ public class BudgetService {
 
     public List<BudgetResponse> getCurrentWorkspaceBudgets() {
 
-        return budgetRepository.findByWorkspaceIdOrderByYearDescMonthDesc(
-                workspaceContext.getCurrentWorkspaceId()).stream()
-                .map(BudgetResponse::new)
-                .toList();
+        return budgetRepository
+                .findByWorkspaceIdOrderByYearDescMonthDesc(workspaceContext.getCurrentWorkspaceId())
+                .stream().map(BudgetResponse::new).toList();
     }
 
     public BudgetPeriod getBudget(Long id) {
@@ -52,21 +50,21 @@ public class BudgetService {
 
         Workspace workspace = workspaceContext.getCurrentWorkspace();
 
-        if (budgetRepository.findByWorkspaceIdAndMonthAndYear(
-                workspace.getId(), request.getMonth(), request.getYear()).isPresent()) {
+        if (budgetRepository.findByWorkspaceIdAndMonthAndYear(workspace.getId(), request.month(),
+                request.year()).isPresent()) {
 
             throw new IllegalArgumentException("Kỳ ngân sách này đã tồn tại.");
         }
 
-        YearMonth month = YearMonth.of(request.getYear(), request.getMonth());
+        YearMonth month = YearMonth.of(request.year(), request.month());
 
-        BudgetPeriod budget = new BudgetPeriod(
-                workspace, request.getName().trim(), month.getMonthValue(), month.getYear(),
-                month.atDay(1), month.atEndOfMonth(), request.getTotalIncome());
+        BudgetPeriod budget = new BudgetPeriod(workspace, request.name().trim(),
+                month.getMonthValue(), month.getYear(), month.atDay(1), month.atEndOfMonth(),
+                request.totalIncome());
 
-        if (request.getRolloverPolicy() != null) {
+        if (request.rolloverPolicy() != null) {
 
-            budget.setRolloverPolicy(request.getRolloverPolicy());
+            budget.setRolloverPolicy(request.rolloverPolicy());
         }
 
         return budgetRepository.save(budget);
@@ -81,16 +79,17 @@ public class BudgetService {
 
         if (budget.getStatus() != BudgetStatus.DRAFT) {
 
-            throw new IllegalArgumentException("Chỉ có thể xác nhận kỳ ngân sách đang ở trạng thái nháp.");
+            throw new IllegalArgumentException(
+                    "Chỉ có thể xác nhận kỳ ngân sách đang ở trạng thái nháp.");
         }
 
         BigDecimal allocated = envelopeRepository.findByBudgetPeriodId(budgetId).stream()
-                .map(Envelope::getAllocatedAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .map(Envelope::getAllocatedAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
 
         if (allocated.compareTo(budget.getTotalIncome()) != 0) {
 
-            throw new IllegalArgumentException("Cần phân bổ đúng bằng tổng thu nhập trước khi xác nhận.");
+            throw new IllegalArgumentException(
+                    "Cần phân bổ đúng bằng tổng thu nhập trước khi xác nhận.");
         }
 
         budget.setTotalAllocated(allocated);
@@ -99,9 +98,10 @@ public class BudgetService {
 
     private void requireEditorRole() {
 
-        MemberRole role = workspaceContext.getCurrentUserRoleInWorkspace(
-                workspaceContext.getCurrentWorkspaceId())
-                .orElseThrow(() -> new AccessDeniedException("Bạn không có quyền sửa kỳ ngân sách này."));
+        MemberRole role = workspaceContext
+                .getCurrentUserRoleInWorkspace(workspaceContext.getCurrentWorkspaceId())
+                .orElseThrow(() -> new AccessDeniedException(
+                        "Bạn không có quyền sửa kỳ ngân sách này."));
 
         if (role == MemberRole.VIEWER) {
 

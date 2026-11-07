@@ -33,13 +33,10 @@ public class BudgetController {
     @GetMapping("/new")
     public String form(Model model) {
 
-        BudgetRequest request = new BudgetRequest();
-
         YearMonth currentMonth = YearMonth.now();
-
-        request.setMonth(currentMonth.getMonthValue());
-        request.setYear(currentMonth.getYear());
-        request.setName("Ngân sách tháng " + currentMonth.getMonthValue());
+        BudgetRequest request = new BudgetRequest(
+                "Ngân sách tháng " + currentMonth.getMonthValue(),
+                currentMonth.getMonthValue(), currentMonth.getYear(), null, null);
 
         model.addAttribute("budgetRequest", request);
 

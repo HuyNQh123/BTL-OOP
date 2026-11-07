@@ -175,6 +175,8 @@ class DesignSystemTemplateIntegrationTest {
                     "invitations", List.of(), "members", List.of(),
                     "workspaceForm", new WorkspaceCreateRequest(), "updateForm", new WorkspaceUpdateRequest()));
             view.addObject("updateForm", new WorkspaceUpdateRequest(workspace.getName(), workspace.getDescription()));
+            view.addObject("budgetRequest", new com.smartenvelope.dto.budget.BudgetRequest(null, null, null, null, null));
+            view.addObject("savingsGoalRequest", new com.smartenvelope.dto.savings.SavingsGoalRequest(null, null, null, null));
             if (PAGES.get(index).startsWith("error/")) view.addObject("errorMessage", "java.sql.SQLException: confidential-internal-detail");
             if (filled) {
                 User target = new User("thanhvien", "", "Thành viên có họ và tên dài để kiểm tra bảng", "thanhvien@example.test", Role.USER);

@@ -6,6 +6,9 @@ import com.smartenvelope.entity.Workspace;
 import com.smartenvelope.enums.Role;
 import com.smartenvelope.enums.WorkspaceType;
 import com.smartenvelope.service.CurrentUserService;
+import com.smartenvelope.service.AlertService;
+import com.smartenvelope.service.BudgetStreakService;
+import com.smartenvelope.service.DashboardService;
 import com.smartenvelope.service.WorkspaceContextService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -35,10 +38,20 @@ class DashboardControllerTest {
     @Mock
     private WorkspaceContextService workspaceContextService;
 
+    @Mock
+    private AlertService alertService;
+
+    @Mock
+    private BudgetStreakService budgetStreakService;
+
+    @Mock
+    private DashboardService dashboardService;
+
     @BeforeEach
     void setUp() {
-        DashboardController dashboardController = new DashboardController();
-        GlobalModelAttributeAdvice advice = new GlobalModelAttributeAdvice(currentUserService, workspaceContextService);
+        DashboardController dashboardController = new DashboardController(dashboardService);
+        GlobalModelAttributeAdvice advice = new GlobalModelAttributeAdvice(
+                currentUserService, workspaceContextService, alertService, budgetStreakService);
 
         mockMvc = MockMvcBuilders.standaloneSetup(dashboardController)
                 .setControllerAdvice(advice)

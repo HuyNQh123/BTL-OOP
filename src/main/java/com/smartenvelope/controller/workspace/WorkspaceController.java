@@ -13,7 +13,6 @@ import com.smartenvelope.service.CurrentUserService;
 import com.smartenvelope.service.WorkspaceInvitationService;
 import com.smartenvelope.service.WorkspaceService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,7 +34,6 @@ public class WorkspaceController {
     private final WorkspaceInvitationService invitationService;
     private final CurrentUserService currentUserService;
 
-    @Autowired
     public WorkspaceController(WorkspaceService workspaceService,
                                WorkspaceInvitationService invitationService,
                                CurrentUserService currentUserService) {

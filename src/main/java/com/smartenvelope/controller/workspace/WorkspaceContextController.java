@@ -4,7 +4,6 @@ import com.smartenvelope.service.WorkspaceContextService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;

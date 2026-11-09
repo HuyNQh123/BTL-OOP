@@ -29,6 +29,7 @@ public class SavingsGoalController {
         model.addAttribute("goals", savingsGoalService.getGoals());
 
         model.addAttribute("piggyBankBalance", savingsGoalService.getPiggyBankBalance());
+        model.addAttribute("surplusInfo", savingsGoalService.getPreviousMonthSurplusInfo());
 
         return "savings/list";
     }
@@ -38,7 +39,6 @@ public class SavingsGoalController {
 
         model.addAttribute("savingsGoalRequest",
                 new SavingsGoalRequest(null, null, null, null));
-
         return "savings/form";
     }
 
@@ -83,6 +83,19 @@ public class SavingsGoalController {
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
         }
 
+        return "redirect:/savings";
+    }
+
+    @PostMapping("/{id}/sweep-surplus")
+    public String sweepSurplus(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            BigDecimal transferred = savingsGoalService.sweepPreviousMonthSurplus(id);
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Đã chuyển " + java.text.NumberFormat.getIntegerInstance(java.util.Locale.US).format(transferred)
+                            + " ₫ tiền dư tháng trước vào mục tiêu tiết kiệm.");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        }
         return "redirect:/savings";
     }
 }

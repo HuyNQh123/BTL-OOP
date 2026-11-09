@@ -1,6 +1,9 @@
 package com.smartenvelope.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import java.time.LocalDateTime;
 
 /**
@@ -8,6 +11,9 @@ import java.time.LocalDateTime;
  * Ghi lại mọi biến động khi tạo mới, cập nhật hoặc hủy giao dịch, hỗ trợ truy vết số liệu.
  * Phụ trách bởi: Thành viên 3 (Transaction & Ledger Processing).
  */
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "transaction_audits")
 public class TransactionAudit {
@@ -36,9 +42,6 @@ public class TransactionAudit {
     @Column(name = "changed_at", nullable = false, updatable = false)
     private LocalDateTime changedAt;
 
-    public TransactionAudit() {
-    }
-
     public TransactionAudit(Transaction transaction, String action, String oldValues, String newValues, User changedBy) {
         this.transaction = transaction;
         this.action = action;
@@ -52,60 +55,5 @@ public class TransactionAudit {
         this.changedAt = LocalDateTime.now();
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Transaction getTransaction() {
-        return transaction;
-    }
-
-    public void setTransaction(Transaction transaction) {
-        this.transaction = transaction;
-    }
-
-    public String getAction() {
-        return action;
-    }
-
-    public void setAction(String action) {
-        this.action = action;
-    }
-
-    public String getOldValues() {
-        return oldValues;
-    }
-
-    public void setOldValues(String oldValues) {
-        this.oldValues = oldValues;
-    }
-
-    public String getNewValues() {
-        return newValues;
-    }
-
-    public void setNewValues(String newValues) {
-        this.newValues = newValues;
-    }
-
-    public User getChangedBy() {
-        return changedBy;
-    }
-
-    public void setChangedBy(User changedBy) {
-        this.changedBy = changedBy;
-    }
-
-    public LocalDateTime getChangedAt() {
-        return changedAt;
-    }
-
-    public void setChangedAt(LocalDateTime changedAt) {
-        this.changedAt = changedAt;
-    }
 }
 

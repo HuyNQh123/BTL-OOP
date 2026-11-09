@@ -4,7 +4,6 @@ import com.smartenvelope.dto.admin.AdminCategoryRequest;
 import com.smartenvelope.entity.Category;
 import com.smartenvelope.entity.User;
 import com.smartenvelope.enums.CategoryType;
-import com.smartenvelope.exception.ResourceNotFoundException;
 import com.smartenvelope.repository.CategoryRepository;
 import com.smartenvelope.repository.TransactionRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,7 +14,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.access.AccessDeniedException;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;

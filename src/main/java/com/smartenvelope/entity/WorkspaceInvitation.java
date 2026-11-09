@@ -3,12 +3,19 @@ package com.smartenvelope.entity;
 import com.smartenvelope.enums.InvitationStatus;
 import com.smartenvelope.enums.MemberRole;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import java.time.LocalDateTime;
 
 /**
  * Entity đại diện cho lời mời tham gia Quỹ chung (Workspace) qua email.
  * Phụ trách bởi: Thành viên 1.
  */
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "workspace_invitations")
 public class WorkspaceInvitation {
@@ -22,6 +29,7 @@ public class WorkspaceInvitation {
     private Workspace workspace;
 
     @Column(name = "email", nullable = false, length = 100)
+    @Setter(AccessLevel.NONE)
     private String email;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -47,9 +55,6 @@ public class WorkspaceInvitation {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
-
-    public WorkspaceInvitation() {
-    }
 
     public WorkspaceInvitation(Workspace workspace, String email, User invitedBy, MemberRole role, String token, LocalDateTime expiresAt) {
         this.workspace = workspace;
@@ -89,84 +94,9 @@ public class WorkspaceInvitation {
         return status == InvitationStatus.PENDING && !isExpired();
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Workspace getWorkspace() {
-        return workspace;
-    }
-
-    public void setWorkspace(Workspace workspace) {
-        this.workspace = workspace;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
     public void setEmail(String email) {
         this.email = email != null ? email.toLowerCase().trim() : null;
     }
 
-    public User getInvitedBy() {
-        return invitedBy;
-    }
-
-    public void setInvitedBy(User invitedBy) {
-        this.invitedBy = invitedBy;
-    }
-
-    public MemberRole getRole() {
-        return role;
-    }
-
-    public void setRole(MemberRole role) {
-        this.role = role;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public InvitationStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(InvitationStatus status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getExpiresAt() {
-        return expiresAt;
-    }
-
-    public void setExpiresAt(LocalDateTime expiresAt) {
-        this.expiresAt = expiresAt;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
 }
 

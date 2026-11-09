@@ -1,8 +1,6 @@
 package com.smartenvelope.service;
 
 import com.smartenvelope.dto.workspace.WorkspaceCreateRequest;
-import com.smartenvelope.dto.workspace.WorkspaceMemberDTO;
-import com.smartenvelope.dto.workspace.WorkspaceSummaryDTO;
 import com.smartenvelope.dto.workspace.WorkspaceUpdateRequest;
 import com.smartenvelope.entity.Membership;
 import com.smartenvelope.entity.User;
@@ -11,7 +9,6 @@ import com.smartenvelope.enums.MemberRole;
 import com.smartenvelope.enums.MembershipStatus;
 import com.smartenvelope.enums.Role;
 import com.smartenvelope.enums.WorkspaceType;
-import com.smartenvelope.exception.ResourceNotFoundException;
 import com.smartenvelope.repository.AccountRepository;
 import com.smartenvelope.repository.MembershipRepository;
 import com.smartenvelope.repository.WorkspaceRepository;
@@ -23,8 +20,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.access.AccessDeniedException;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;

@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -35,6 +36,15 @@ public class UserFinanceSettings {
     @Column(name = "salary_day", nullable = false)
     private Integer salaryDay = 5;
 
+    @Column(name = "expected_salary", nullable = false, precision = 19, scale = 0)
+    private BigDecimal expectedSalary = BigDecimal.ZERO;
+
+    @Column(name = "hourly_wage", nullable = false, precision = 19, scale = 0)
+    private BigDecimal hourlyWage = BigDecimal.ZERO;
+
+    @Column(name = "budget_reminder_time", nullable = false)
+    private LocalTime budgetReminderTime = LocalTime.of(10, 0);
+
     @Column(name = "warning_threshold", nullable = false)
     private Integer warningThreshold = 80;
 
@@ -43,7 +53,7 @@ public class UserFinanceSettings {
     private RolloverPolicy rolloverPolicy = RolloverPolicy.SWEEP_TO_PIGGY;
 
     @Column(name = "daily_reminder_time")
-    private LocalTime dailyReminderTime;
+    private LocalTime dailyReminderTime = LocalTime.of(22, 0);
 
     @Column(name = "currency", nullable = false, length = 10)
     private String currency = "VND";
@@ -75,6 +85,21 @@ public class UserFinanceSettings {
         if (this.salaryDay == null) {
 
             this.salaryDay = 5;
+        }
+
+        if (this.expectedSalary == null) {
+            this.expectedSalary = BigDecimal.ZERO;
+        }
+        if (this.hourlyWage == null) {
+            this.hourlyWage = BigDecimal.ZERO;
+        }
+
+        if (this.budgetReminderTime == null) {
+            this.budgetReminderTime = LocalTime.of(10, 0);
+        }
+
+        if (this.dailyReminderTime == null) {
+            this.dailyReminderTime = LocalTime.of(22, 0);
         }
 
         if (this.warningThreshold == null) {

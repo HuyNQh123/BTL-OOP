@@ -15,4 +15,6 @@ public interface PiggyBankEntryRepository extends JpaRepository<PiggyBankEntry, 
     List<PiggyBankEntry> findByPiggyBankIdOrderByCreatedAtDesc(Long piggyBankId);
 
     List<PiggyBankEntry> findByPiggyBankIdAndType(Long piggyBankId, PiggyBankEntryType type);
+
+    boolean existsBySourceEnvelopeId(Long sourceEnvelopeId);
 }

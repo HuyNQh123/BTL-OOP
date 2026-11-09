@@ -7,7 +7,6 @@ import com.smartenvelope.exception.ResourceNotFoundException;
 import com.smartenvelope.service.CurrentUserService;
 import com.smartenvelope.service.WorkspaceInvitationService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,7 +26,6 @@ public class WorkspaceInvitationController {
     private final WorkspaceInvitationService invitationService;
     private final CurrentUserService currentUserService;
 
-    @Autowired
     public WorkspaceInvitationController(WorkspaceInvitationService invitationService,
                                          CurrentUserService currentUserService) {
         this.invitationService = invitationService;

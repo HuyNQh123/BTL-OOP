@@ -1,10 +1,12 @@
 package com.smartenvelope.dto.account;
 
-/**
- * DTO trả về thông tin chi tiết của tài khoản nguồn tiền để hiển thị giao diện.
- * Phụ trách bởi: Thành viên 2.
- */
-public class AccountResponse {
-    // TODO: Thành viên 2 khai báo id, name, type, balance, createdAt
-}
+import com.smartenvelope.entity.Account;
+import com.smartenvelope.enums.AccountType;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
+public record AccountResponse(Long id, String name, AccountType type, BigDecimal balance, LocalDateTime createdAt) {
+    public AccountResponse(Account account) {
+        this(account.getId(), account.getName(), account.getType(), account.getBalance(), account.getCreatedAt());
+    }
+}

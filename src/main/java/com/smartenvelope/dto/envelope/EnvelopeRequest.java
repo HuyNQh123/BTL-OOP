@@ -1,10 +1,14 @@
 package com.smartenvelope.dto.envelope;
 
-/**
- * DTO tiếp nhận dữ liệu tạo mới hoặc điều chỉnh phong bì ngân sách.
- * Phụ trách bởi: Thành viên 2.
- */
-public class EnvelopeRequest {
-    // TODO: Thành viên 2 khai báo budgetPeriodId, categoryId, name, allocatedAmount và validation
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import java.math.BigDecimal;
+
+public record EnvelopeRequest(
+        @NotNull(message = "Vui lòng chọn kỳ ngân sách.") Long budgetPeriodId,
+        @NotNull(message = "Vui lòng chọn danh mục.") Long categoryId,
+        @Size(max = 100, message = "Tên phong bì tối đa 100 ký tự.") String name,
+        @NotNull(message = "Vui lòng nhập số tiền phân bổ.") @DecimalMin(value = "0", message = "Số tiền không được âm.") BigDecimal allocatedAmount) {
 }
 

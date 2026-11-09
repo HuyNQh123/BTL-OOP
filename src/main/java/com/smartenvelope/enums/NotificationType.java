@@ -7,6 +7,7 @@ package com.smartenvelope.enums;
 public enum NotificationType {
     OVERSPENT,
     NEAR_LIMIT,
+    BUDGET_REMINDER,
     SALARY_REMINDER,
     BUDGET_CONFIRMED,
     INVITATION,

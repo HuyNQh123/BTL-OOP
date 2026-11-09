@@ -1,8 +1,12 @@
 package com.smartenvelope.controller.auth;
 
 import com.smartenvelope.dto.auth.RegisterRequest;
-import com.smartenvelope.service.UserService;
+import com.smartenvelope.service.AuthService;
+import com.smartenvelope.service.RegistrationEmailVerificationService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,6 +16,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
@@ -21,10 +26,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 public class AuthController {
 
-    private final UserService userService;
+    private final AuthService authService;
+    private final RegistrationEmailVerificationService emailVerificationService;
 
-    public AuthController(UserService userService) {
-        this.userService = userService;
+    public AuthController(AuthService authService, RegistrationEmailVerificationService emailVerificationService) {
+        this.authService = authService;
+        this.emailVerificationService = emailVerificationService;
     }
 
     /**
@@ -66,6 +73,21 @@ public class AuthController {
         return "auth/register";
     }
 
+    @PostMapping("/register/send-code")
+    public ResponseEntity<String> sendRegistrationEmailCode(@RequestParam String email, HttpSession session) {
+        if (authService.existsByEmail(email)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email này đã được sử dụng.");
+        }
+        try {
+            emailVerificationService.sendCode(email, session);
+            return ResponseEntity.ok("Đã gửi mã xác minh. Mã có hiệu lực trong 10 phút.");
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.badRequest().body(exception.getMessage());
+        } catch (IllegalStateException exception) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(exception.getMessage());
+        }
+    }
+
     /**
      * Tiếp nhận và xử lý dữ liệu form Đăng ký tài khoản.
      */
@@ -73,7 +95,8 @@ public class AuthController {
     public String handleRegister(@Valid @ModelAttribute("registerRequest") RegisterRequest request,
                                  BindingResult bindingResult,
                                  Model model,
-                                 RedirectAttributes redirectAttributes) {
+                                 RedirectAttributes redirectAttributes,
+                                 HttpSession session) {
 
         // 1. Kiểm tra xác nhận mật khẩu
         if (request.getPassword() != null && request.getConfirmPassword() != null
@@ -82,13 +105,13 @@ public class AuthController {
         }
 
         // 2. Kiểm tra trùng email
-        if (request.getEmail() != null && userService.existsByEmail(request.getEmail())) {
+        if (request.getEmail() != null && authService.existsByEmail(request.getEmail())) {
             bindingResult.rejectValue("email", "error.email", "Địa chỉ email này đã được sử dụng");
         }
 
         // 3. Kiểm tra trùng username (nếu có nhập)
         if (request.getUsername() != null && !request.getUsername().trim().isEmpty()
-                && userService.existsByUsername(request.getUsername())) {
+                && authService.existsByUsername(request.getUsername())) {
             bindingResult.rejectValue("username", "error.username", "Tên đăng nhập này đã được sử dụng");
         }
 
@@ -97,8 +120,15 @@ public class AuthController {
             return "auth/register";
         }
 
+        if (!emailVerificationService.verify(request.getEmail(), request.getEmailVerificationCode(), session)) {
+            bindingResult.rejectValue("emailVerificationCode", "error.emailVerificationCode",
+                    "Mã xác minh không đúng, đã hết hạn hoặc chưa được gửi tới email này.");
+            return "auth/register";
+        }
+
         try {
-            userService.register(request);
+            authService.register(request);
+            emailVerificationService.clear(session);
             redirectAttributes.addFlashAttribute("successMessage", 
                     "Đăng ký tài khoản thành công! Vui lòng đăng nhập để bắt đầu quản lý tài chính.");
             return "redirect:/login?registered=true";

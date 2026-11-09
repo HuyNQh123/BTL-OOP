@@ -2,18 +2,23 @@ package com.smartenvelope.entity;
 
 import com.smartenvelope.enums.AccountType;
 import jakarta.persistence.*;
+// import lombok.NoArgsConstructor;
+import lombok.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
  * Entity đại diện cho tài khoản tài chính (ngân hàng, tiền mặt, thẻ tín dụng,
- * tiết kiệm).
- * Lưu giữ số dư thực tế theo đơn vị VND (BigDecimal scale 0) và hỗ trợ
- * Optimistic Locking qua trường version.
- * Phụ trách bởi: Thành viên 2 (Account & Category Management).
+ * tiết kiệm). Lưu giữ số dư thực tế theo đơn vị VND (BigDecimal scale 0) và hỗ
+ * trợ Optimistic Locking qua trường version. Phụ trách bởi: Thành viên 2
+ * (Account & Category Management).
  */
 @Entity
 @Table(name = "accounts")
+@Setter
+@Getter
+// @NoArgsConstructor
 public class Account {
 
     @Id
@@ -56,7 +61,8 @@ public class Account {
     public Account() {
     }
 
-    public Account(Workspace workspace, String name, AccountType type, BigDecimal balance, String currency) {
+    public Account(Workspace workspace, String name, AccountType type, BigDecimal balance,
+            String currency) {
         this.workspace = workspace;
         this.name = name;
         this.type = type;
@@ -82,93 +88,5 @@ public class Account {
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Workspace getWorkspace() {
-        return workspace;
-    }
-
-    public void setWorkspace(Workspace workspace) {
-        this.workspace = workspace;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public AccountType getType() {
-        return type;
-    }
-
-    public void setType(AccountType type) {
-        this.type = type;
-    }
-
-    public BigDecimal getBalance() {
-        return balance;
-    }
-
-    public void setBalance(BigDecimal balance) {
-        this.balance = balance;
-    }
-
-    public String getCurrency() {
-        return currency;
-    }
-
-    public void setCurrency(String currency) {
-        this.currency = currency;
-    }
-
-    public String getAccountNumber() {
-        return accountNumber;
-    }
-
-    public void setAccountNumber(String accountNumber) {
-        this.accountNumber = accountNumber;
-    }
-
-    public String getBankName() {
-        return bankName;
-    }
-
-    public void setBankName(String bankName) {
-        this.bankName = bankName;
-    }
-
-    public Integer getVersion() {
-        return version;
-    }
-
-    public void setVersion(Integer version) {
-        this.version = version;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 }

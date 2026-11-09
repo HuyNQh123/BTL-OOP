@@ -6,6 +6,7 @@ import com.smartenvelope.enums.SavingsGoalStatus;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 
 public record SavingsGoalResponse(
@@ -28,7 +29,7 @@ public record SavingsGoalResponse(
                         .min(BigDecimal.valueOf(100)).intValue(),
                 goal.getTargetDate() == null ? null
                         : Math.max(0,
-                                ChronoUnit.DAYS.between(LocalDate.now(), goal.getTargetDate())),
+                                ChronoUnit.DAYS.between(LocalDate.now(ZoneId.of("Asia/Ho_Chi_Minh")), goal.getTargetDate())),
                 goal.getTargetDate(), goal.getStatus());
     }
 }

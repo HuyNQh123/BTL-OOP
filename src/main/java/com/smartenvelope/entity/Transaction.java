@@ -3,6 +3,9 @@ package com.smartenvelope.entity;
 import com.smartenvelope.enums.TransactionStatus;
 import com.smartenvelope.enums.TransactionType;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,6 +17,9 @@ import java.time.LocalDateTime;
  * Hỗ trợ Optimistic Locking qua version.
  * Phụ trách bởi: Thành viên 3 (Transaction & Ledger Processing).
  */
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "transactions")
 public class Transaction {
@@ -59,6 +65,9 @@ public class Transaction {
     @Column(name = "note", columnDefinition = "TEXT")
     private String note;
 
+    @Column(name = "non_essential", nullable = false)
+    private Boolean nonEssential = false;
+
     @Version
     @Column(name = "version", nullable = false)
     private Integer version = 0;
@@ -68,9 +77,6 @@ public class Transaction {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
-
-    public Transaction() {
-    }
 
     public Transaction(Workspace workspace, Account account, Envelope envelope, Category category,
                        User user, BigDecimal amount, TransactionType type, LocalDate transactionDate, String note) {
@@ -103,115 +109,4 @@ public class Transaction {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Workspace getWorkspace() {
-        return workspace;
-    }
-
-    public void setWorkspace(Workspace workspace) {
-        this.workspace = workspace;
-    }
-
-    public Account getAccount() {
-        return account;
-    }
-
-    public void setAccount(Account account) {
-        this.account = account;
-    }
-
-    public Envelope getEnvelope() {
-        return envelope;
-    }
-
-    public void setEnvelope(Envelope envelope) {
-        this.envelope = envelope;
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
-    public TransactionType getType() {
-        return type;
-    }
-
-    public void setType(TransactionType type) {
-        this.type = type;
-    }
-
-    public TransactionStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(TransactionStatus status) {
-        this.status = status;
-    }
-
-    public LocalDate getTransactionDate() {
-        return transactionDate;
-    }
-
-    public void setTransactionDate(LocalDate transactionDate) {
-        this.transactionDate = transactionDate;
-    }
-
-    public String getNote() {
-        return note;
-    }
-
-    public void setNote(String note) {
-        this.note = note;
-    }
-
-    public Integer getVersion() {
-        return version;
-    }
-
-    public void setVersion(Integer version) {
-        this.version = version;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
 }

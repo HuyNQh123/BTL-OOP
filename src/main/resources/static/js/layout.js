@@ -1,5 +1,30 @@
 /** Điều hướng dùng chung; Bootstrap quản lý overlay, focus trap và khóa cuộn. */
 document.addEventListener('DOMContentLoaded', function () {
+    // Keep the account menu responsive even if Bootstrap's dropdown bundle is unavailable.
+    const accountToggle = document.getElementById('userMenu');
+    const accountMenu = document.getElementById('accountMenu');
+    if (accountToggle && accountMenu && !(window.bootstrap && window.bootstrap.Dropdown)) {
+        const setAccountMenuOpen = function (open) {
+            accountMenu.classList.toggle('show', open);
+            accountToggle.setAttribute('aria-expanded', String(open));
+        };
+        accountToggle.addEventListener('click', function (event) {
+            event.stopPropagation();
+            setAccountMenuOpen(accountToggle.getAttribute('aria-expanded') !== 'true');
+        });
+        document.addEventListener('click', function (event) {
+            if (!accountMenu.contains(event.target) && !accountToggle.contains(event.target)) {
+                setAccountMenuOpen(false);
+            }
+        });
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape' && accountToggle.getAttribute('aria-expanded') === 'true') {
+                setAccountMenuOpen(false);
+                accountToggle.focus();
+            }
+        });
+    }
+
     const sidebar = document.getElementById('sidebarMenu');
     if (!sidebar) return;
     if (!document.documentElement.lang) document.documentElement.lang = 'vi';

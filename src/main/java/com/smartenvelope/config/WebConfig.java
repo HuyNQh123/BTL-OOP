@@ -1,6 +1,9 @@
 package com.smartenvelope.config;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.format.FormatterRegistry;
+import org.springframework.format.datetime.standard.DateTimeFormatterRegistrar;
+import java.time.format.DateTimeFormatter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -10,6 +13,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-    // TODO: Thành viên 1 bổ sung các cấu hình Web MVC khi cần thiết
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+        DateTimeFormatterRegistrar registrar = new DateTimeFormatterRegistrar();
+        registrar.setDateFormatter(DateTimeFormatter.ISO_LOCAL_DATE);
+        registrar.setDateTimeFormatter(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        registrar.registerFormatters(registry);
+    }
 }
 

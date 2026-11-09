@@ -8,19 +8,21 @@ import com.smartenvelope.entity.Workspace;
 import com.smartenvelope.enums.Role;
 import com.smartenvelope.enums.WorkspaceType;
 import com.smartenvelope.service.CurrentUserService;
+import com.smartenvelope.service.DashboardService;
 import com.smartenvelope.service.CustomUserDetailsService;
 import com.smartenvelope.service.WorkspaceContextService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
+import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
@@ -37,9 +39,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(SecurityConfig.class)
 class SharedLayoutSecurityTest {
     @Autowired MockMvc mockMvc;
-    @MockBean CurrentUserService currentUserService;
-    @MockBean WorkspaceContextService workspaceContextService;
-    @MockBean CustomUserDetailsService customUserDetailsService;
+    @MockitoBean CurrentUserService currentUserService;
+    @MockitoBean WorkspaceContextService workspaceContextService;
+    @MockitoBean CustomUserDetailsService customUserDetailsService;
+    @MockitoBean DashboardService dashboardService;
 
     @BeforeEach
     void prepareModel() {
@@ -52,6 +55,9 @@ class SharedLayoutSecurityTest {
         when(workspaceContextService.getCurrentWorkspace()).thenReturn(workspace);
         when(workspaceContextService.getCurrentWorkspaceId()).thenReturn(101L);
         when(workspaceContextService.getAvailableWorkspaces()).thenReturn(List.of(workspace));
+        when(dashboardService.getSummary()).thenReturn(new DashboardService.Summary(
+                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,
+                BigDecimal.ZERO, null, List.of()));
     }
 
     @Test

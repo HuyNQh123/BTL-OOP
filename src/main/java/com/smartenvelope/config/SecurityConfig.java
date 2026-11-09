@@ -12,8 +12,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.OrRequestMatcher;
 
 /**
  * Cấu hình bảo mật Spring Security cho hệ thống SmartEnvelope.
@@ -27,9 +25,12 @@ import org.springframework.security.web.util.matcher.OrRequestMatcher;
 public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
+    private final NotificationEmailSuccessHandler notificationEmailSuccessHandler;
 
-    public SecurityConfig(CustomUserDetailsService userDetailsService) {
+    public SecurityConfig(CustomUserDetailsService userDetailsService,
+                          NotificationEmailSuccessHandler notificationEmailSuccessHandler) {
         this.userDetailsService = userDetailsService;
+        this.notificationEmailSuccessHandler = notificationEmailSuccessHandler;
     }
 
     @Bean
@@ -39,8 +40,7 @@ public class SecurityConfig {
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
@@ -69,6 +69,7 @@ public class SecurityConfig {
                     "/", 
                     "/login", 
                     "/register", 
+                    "/register/**",
                     "/auth/**", 
                     "/error/**"
                 ).permitAll()
@@ -83,16 +84,13 @@ public class SecurityConfig {
                 .loginProcessingUrl("/login")
                 .usernameParameter("email")
                 .passwordParameter("password")
-                .defaultSuccessUrl("/dashboard", true)
+                .successHandler(notificationEmailSuccessHandler)
                 .failureUrl("/login?error=true")
                 .permitAll()
             )
-            // 3. Cấu hình Logout (hỗ trợ cả /logout và /auth/logout bằng GET và POST)
+            // 3. Đăng xuất bằng POST để Spring Security kiểm tra CSRF như các form khác.
             .logout(logout -> logout
-                .logoutRequestMatcher(new OrRequestMatcher(
-                    new AntPathRequestMatcher("/logout"),
-                    new AntPathRequestMatcher("/auth/logout")
-                ))
+                .logoutUrl("/logout")
                 .logoutSuccessUrl("/login?logout=true")
                 .invalidateHttpSession(true)
                 .clearAuthentication(true)

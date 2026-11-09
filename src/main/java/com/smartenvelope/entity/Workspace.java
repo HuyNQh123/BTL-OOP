@@ -2,12 +2,18 @@ package com.smartenvelope.entity;
 
 import com.smartenvelope.enums.WorkspaceType;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import java.time.LocalDateTime;
 
 /**
  * Entity đại diện cho không gian quản lý tài chính (cá nhân hoặc quỹ chung/gia đình).
  * Phụ trách bởi: Thành viên 1 & Thành viên 2.
  */
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "workspaces")
 public class Workspace {
@@ -36,9 +42,6 @@ public class Workspace {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    public Workspace() {
-    }
-
     public Workspace(String name, WorkspaceType type, String description, User owner) {
         this.name = name;
         this.type = type;
@@ -60,60 +63,5 @@ public class Workspace {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public WorkspaceType getType() {
-        return type;
-    }
-
-    public void setType(WorkspaceType type) {
-        this.type = type;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public User getOwner() {
-        return owner;
-    }
-
-    public void setOwner(User owner) {
-        this.owner = owner;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
 }
 

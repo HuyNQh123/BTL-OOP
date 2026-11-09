@@ -3,6 +3,8 @@ package com.smartenvelope.controller.advice;
 import com.smartenvelope.entity.User;
 import com.smartenvelope.entity.Workspace;
 import com.smartenvelope.service.CurrentUserService;
+import com.smartenvelope.service.AlertService;
+import com.smartenvelope.service.BudgetStreakService;
 import com.smartenvelope.service.WorkspaceContextService;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -25,11 +27,17 @@ public class GlobalModelAttributeAdvice {
 
     private final CurrentUserService currentUserService;
     private final WorkspaceContextService workspaceContextService;
+    private final AlertService alertService;
+    private final BudgetStreakService budgetStreakService;
 
     public GlobalModelAttributeAdvice(CurrentUserService currentUserService,
-                                      WorkspaceContextService workspaceContextService) {
+                                      WorkspaceContextService workspaceContextService,
+                                      AlertService alertService,
+                                      BudgetStreakService budgetStreakService) {
         this.currentUserService = currentUserService;
         this.workspaceContextService = workspaceContextService;
+        this.alertService = alertService;
+        this.budgetStreakService = budgetStreakService;
     }
 
     @ModelAttribute("currentUser")
@@ -77,6 +85,31 @@ public class GlobalModelAttributeAdvice {
             return workspaceContextService.getAvailableWorkspaces();
         } catch (Exception ignored) {
             return Collections.emptyList();
+        }
+    }
+
+    @ModelAttribute("unreadNotificationCount")
+    public long unreadNotificationCount() {
+        if (!currentUserService.isAuthenticated()) {
+            return 0;
+        }
+        try {
+            return alertService.getUnreadNotificationCount();
+        } catch (Exception ignored) {
+            return 0;
+        }
+    }
+
+    @ModelAttribute("budgetStreakDays")
+    public int budgetStreakDays() {
+        if (!currentUserService.isAuthenticated()) {
+            return 0;
+        }
+        try {
+            return budgetStreakService.getCurrentStreak(currentUserService.getCurrentUserId(),
+                    workspaceContextService.getCurrentWorkspaceId());
+        } catch (Exception ignored) {
+            return 0;
         }
     }
 }

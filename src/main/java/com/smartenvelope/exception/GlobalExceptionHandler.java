@@ -7,6 +7,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
+import org.springframework.http.ResponseEntity;
 
 /**
  * Lớp bắt và xử lý ngoại lệ tập trung cho toàn bộ ứng dụng (ControllerAdvice).
@@ -16,6 +18,12 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<Void> handleMissingStaticResource(NoResourceFoundException ex) {
+        log.debug("Static resource not found: {}", ex.getResourcePath());
+        return ResponseEntity.notFound().build();
+    }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public String handleResourceNotFound(ResourceNotFoundException ex, Model model) {
@@ -44,7 +52,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public String handleGlobalException(Exception ex, Model model) {
-        log.error("Unhandled Exception caught by GlobalExceptionHandler: ", ex);
+        log.error("Unhandled exception caught by GlobalExceptionHandler [{}]: {}",
+                ex.getClass().getName(), ex.getMessage(), ex);
         model.addAttribute("errorMessage", ex.getMessage() != null ? ex.getMessage() : ex.getClass().getSimpleName());
         return "error/500";
     }

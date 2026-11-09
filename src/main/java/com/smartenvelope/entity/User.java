@@ -3,6 +3,9 @@ package com.smartenvelope.entity;
 import com.smartenvelope.enums.Role;
 import com.smartenvelope.enums.UserStatus;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import java.time.LocalDateTime;
 
 /**
@@ -10,6 +13,9 @@ import java.time.LocalDateTime;
  * Quản lý thông tin đăng nhập, hồ sơ, vai trò hệ thống và trạng thái tài khoản.
  * Phụ trách bởi: Thành viên 1 (Auth & User Management).
  */
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "users")
 public class User {
@@ -30,6 +36,24 @@ public class User {
     @Column(name = "email", nullable = false, unique = true, length = 100)
     private String email;
 
+    @Column(name = "notification_email", length = 100)
+    private String notificationEmail;
+
+    @Column(name = "notification_email_verified", nullable = false)
+    private boolean notificationEmailVerified = false;
+
+    @Column(name = "notification_email_code_hash", length = 64)
+    private String notificationEmailCodeHash;
+
+    @Column(name = "notification_email_code_expires_at")
+    private LocalDateTime notificationEmailCodeExpiresAt;
+
+    @Column(name = "notification_email_code_sent_at")
+    private LocalDateTime notificationEmailCodeSentAt;
+
+    @Column(name = "notification_email_code_attempts", nullable = false)
+    private int notificationEmailCodeAttempts = 0;
+
     @Column(name = "phone", length = 20)
     private String phone;
 
@@ -49,9 +73,6 @@ public class User {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
-
-    public User() {
-    }
 
     public User(String username, String password, String fullName, String email, Role role) {
         this.username = username;
@@ -79,91 +100,4 @@ public class User {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getAvatarUrl() {
-        return avatarUrl;
-    }
-
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
-    public UserStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(UserStatus status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
 }

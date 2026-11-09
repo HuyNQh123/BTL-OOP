@@ -9,7 +9,6 @@ import com.smartenvelope.entity.WorkspaceInvitation;
 import com.smartenvelope.enums.InvitationStatus;
 import com.smartenvelope.enums.MemberRole;
 import com.smartenvelope.enums.MembershipStatus;
-import com.smartenvelope.enums.NotificationStatus;
 import com.smartenvelope.enums.NotificationType;
 import com.smartenvelope.exception.ResourceNotFoundException;
 import com.smartenvelope.repository.MembershipRepository;
@@ -17,7 +16,6 @@ import com.smartenvelope.repository.NotificationRepository;
 import com.smartenvelope.repository.UserRepository;
 import com.smartenvelope.repository.WorkspaceInvitationRepository;
 import com.smartenvelope.repository.WorkspaceRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,7 +42,6 @@ public class WorkspaceInvitationService {
     private final WorkspaceContextService workspaceContextService;
     private final EmailService emailService;
 
-    @Autowired
     public WorkspaceInvitationService(WorkspaceInvitationRepository invitationRepository,
             WorkspaceRepository workspaceRepository, MembershipRepository membershipRepository,
             UserRepository userRepository, NotificationRepository notificationRepository,
@@ -144,6 +141,7 @@ public class WorkspaceInvitationService {
                         inviter.getFullName() + " đã mời bạn tham gia Quỹ \"" + workspace.getName()
                                 + "\" với vai trò " + roleToAssign + ".",
                         "/invitations");
+                // The invitation email above already delivers this notification and its tokenized link.
                 notificationRepository.save(notif);
             } catch (Exception ignored) {
             }

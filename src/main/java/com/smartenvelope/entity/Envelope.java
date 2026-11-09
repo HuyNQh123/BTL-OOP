@@ -47,6 +47,9 @@ public class Envelope {
     @Column(name = "warning_threshold", nullable = false)
     private Integer warningThreshold = 80;
 
+    @Column(name = "fixed_envelope", nullable = false)
+    private Boolean fixedEnvelope = false;
+
     @Version
     @Column(name = "version", nullable = false)
     private Integer version = 0;

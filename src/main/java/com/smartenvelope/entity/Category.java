@@ -2,6 +2,9 @@ package com.smartenvelope.entity;
 
 import com.smartenvelope.enums.CategoryType;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import java.time.LocalDateTime;
 
 /**
@@ -10,6 +13,9 @@ import java.time.LocalDateTime;
  * và danh mục riêng do từng người dùng tạo (is_system = false, user != null).
  * Phụ trách bởi: Thành viên 2 (Account & Category Management).
  */
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "categories")
 public class Category {
@@ -44,9 +50,6 @@ public class Category {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    public Category() {
-    }
-
     public Category(String name, CategoryType type, String icon, String color, User user, Boolean isSystem) {
         this.name = name;
         this.type = type;
@@ -78,75 +81,4 @@ public class Category {
         }
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public CategoryType getType() {
-        return type;
-    }
-
-    public void setType(CategoryType type) {
-        this.type = type;
-    }
-
-    public String getIcon() {
-        return icon;
-    }
-
-    public void setIcon(String icon) {
-        this.icon = icon;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Boolean getIsSystem() {
-        return isSystem;
-    }
-
-    public void setIsSystem(Boolean isSystem) {
-        this.isSystem = isSystem;
-    }
-
-    public Boolean getIsActive() {
-        return isActive;
-    }
-
-    public void setIsActive(Boolean isActive) {
-        this.isActive = isActive;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
 }

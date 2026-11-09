@@ -5,12 +5,16 @@ import com.smartenvelope.enums.Role;
 import com.smartenvelope.enums.UserStatus;
 
 import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * DTO đóng gói thông tin an toàn của người dùng hiển thị cho Quản trị viên (Admin).
  * Tuyệt đối không bao gồm password hash, reset token hay thông tin xác thực nhạy cảm.
  * Phụ trách bởi: Thành viên 1.
  */
+@Getter
+@NoArgsConstructor
 public class AdminUserResponse {
 
     private Long id;
@@ -24,9 +28,6 @@ public class AdminUserResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private int workspaceCount;
-
-    public AdminUserResponse() {
-    }
 
     public AdminUserResponse(User user, int workspaceCount) {
         this.id = user.getId();
@@ -42,48 +43,5 @@ public class AdminUserResponse {
         this.workspaceCount = workspaceCount;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public String getAvatarUrl() {
-        return avatarUrl;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public UserStatus getStatus() {
-        return status;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public int getWorkspaceCount() {
-        return workspaceCount;
-    }
 }
 

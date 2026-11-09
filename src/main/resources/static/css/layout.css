@@ -43,8 +43,13 @@ body:has(.app-header) {
 .workspace-option.active { color: var(--color-primary); background: var(--color-primary-subtle); }
 .workspace-selected { flex-shrink: 0; }
 .dropdown-empty { padding: var(--space-3) var(--space-4); color: var(--color-text-secondary); }
+.notification-bell { position: relative; display: inline-flex; width: 40px; height: 40px; flex: 0 0 40px; align-items: center; justify-content: center; border-radius: var(--radius-md); color: var(--color-text-secondary); font-size: 1.25rem; text-decoration: none; }
+.notification-bell:hover, .notification-bell:focus-visible { background: var(--color-primary-subtle); color: var(--color-primary); }
+.notification-count { position: absolute; top: 1px; right: 0; min-width: 18px; height: 18px; padding: 0 4px; display: inline-flex; align-items: center; justify-content: center; border: 2px solid var(--color-surface); border-radius: 999px; background: var(--color-danger); color: #fff; font-size: 0.65rem; font-weight: 700; line-height: 1; }
 .user-menu { margin-left: auto; flex-shrink: 0; }
 .user-toggle { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-1) var(--space-2); }
+.budget-streak { display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 999px; background: #fff3dc; color: #9a5b00; font-size: var(--font-helper); font-weight: 600; white-space: nowrap; }
+.budget-streak .bi { font-size: 0.95rem; }
 .user-name { max-width: 160px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .user-chevron { font-size: var(--font-helper); }
 .account-menu { width: 260px; }
@@ -99,6 +104,7 @@ body:has(.app-header) > .d-flex > main { min-width: 0; }
 @media (max-width: 767.98px) {
     .user-name, .user-chevron { display: none; }
     .user-toggle { padding: var(--space-1); }
+    .budget-streak { padding: 4px 6px; }
     .main-content { padding: var(--space-4); }
     /* Bootstrap p-4 được giữ nguyên trong HTML của 12 trang cũ. */
     body:has(.app-header) > .d-flex > main.p-4 { padding: var(--space-4) !important; }

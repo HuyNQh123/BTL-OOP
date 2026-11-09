@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.YearMonth;
+import java.time.ZoneId;
 
 /**
  * Controller xử lý các chức năng thiết lập kỳ ngân sách và phân bổ ngân sách.
@@ -33,13 +34,23 @@ public class BudgetController {
     @GetMapping("/new")
     public String form(Model model) {
 
-        YearMonth currentMonth = YearMonth.now();
+        YearMonth currentMonth = YearMonth.now(ZoneId.of("Asia/Ho_Chi_Minh"));
         BudgetRequest request = new BudgetRequest(
                 "Ngân sách tháng " + currentMonth.getMonthValue(),
-                currentMonth.getMonthValue(), currentMonth.getYear(), null, null);
+                currentMonth.getMonthValue(), currentMonth.getYear(),
+                budgetService.getExpectedSalary().signum() > 0 ? budgetService.getExpectedSalary() : null, null);
 
         model.addAttribute("budgetRequest", request);
 
+        return "budget/form";
+    }
+
+    @GetMapping("/{id}/edit")
+    public String editForm(@PathVariable Long id, Model model) {
+        var budget = budgetService.getBudget(id);
+        model.addAttribute("budgetId", id);
+        model.addAttribute("budgetRequest", new BudgetRequest(budget.getName(), budget.getMonth(), budget.getYear(),
+                budget.getTotalIncome(), budget.getRolloverPolicy()));
         return "budget/form";
     }
 
@@ -67,6 +78,35 @@ public class BudgetController {
             model.addAttribute("errorMessage", ex.getMessage());
             return "budget/form";
         }
+    }
+
+    @PostMapping("/{id}")
+    public String update(@PathVariable Long id, @Valid @ModelAttribute BudgetRequest budgetRequest,
+            BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("budgetId", id);
+            return "budget/form";
+        }
+        try {
+            budgetService.updateDraftBudget(id, budgetRequest);
+            redirectAttributes.addFlashAttribute("successMessage", "Kỳ ngân sách đã được cập nhật.");
+            return "redirect:/budgets";
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("budgetId", id);
+            model.addAttribute("errorMessage", ex.getMessage());
+            return "budget/form";
+        }
+    }
+
+    @PostMapping("/{id}/delete")
+    public String delete(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            budgetService.deleteDraftBudget(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Đã xóa kỳ ngân sách nháp và các phong bì chưa phát sinh lịch sử.");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        }
+        return "redirect:/budgets";
     }
 
     @PostMapping("/{id}/confirm")

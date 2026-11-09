@@ -86,6 +86,9 @@ public class UserService {
         user.setFullName(request.getFullName().trim());
         user.setUsername(username.trim());
         user.setEmail(request.getEmail().trim().toLowerCase());
+        // Registration only reaches this point after the user proves ownership of this address.
+        user.setNotificationEmail(request.getEmail().trim().toLowerCase());
+        user.setNotificationEmailVerified(true);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(Role.USER); // Mặc định luôn là USER thông thường
         user.setStatus(UserStatus.ACTIVE);

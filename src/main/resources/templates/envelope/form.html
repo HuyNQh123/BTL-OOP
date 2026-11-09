@@ -7,28 +7,92 @@
 <div class="d-flex">
     <div th:replace="~{fragments/sidebar :: sidebar('envelopes')}"></div>
     <main class="flex-grow-1 p-4">
-        <h2>Tạo / Sửa Phong Bì Ngân Sách</h2>
-        <!-- TODO: Thành viên 2 thiết kế form chọn danh mục, đặt tên phong bì và số tiền phân bổ -->
+        <h2 th:text="${editing} ? 'Sửa phong bì ngân sách' : 'Tạo phong bì ngân sách'">Tạo phong bì ngân sách</h2>
         <div class="card shadow-sm border-0 p-4 mt-3" style="max-width: 600px;">
-            <form>
+            <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+            <div class="alert alert-warning" th:if="${#lists.isEmpty(budgets)}">Bạn cần tạo kỳ ngân sách ở trạng thái nháp trước khi phân bổ phong bì.</div>
+            <div class="alert alert-info" th:if="${editing}">Bạn có thể tăng hạn mức nếu kỳ còn tiền chưa phân bổ. Số đã chi được giữ nguyên; hạn mức mới không được thấp hơn <strong th:text="${#numbers.formatDecimal(editingSpentAmount, 0, 'COMMA', 0, 'POINT')} + ' ₫ đã chi'"></strong>.</div>
+            <form th:action="@{${formAction}}" th:object="${envelopeRequest}" method="post" th:if="${!#lists.isEmpty(budgets)}" th:attr="data-editing=${editing == true}">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                 <div class="mb-3">
-                    <label class="form-label">Tên phong bì</label>
-                    <input type="text" class="form-control" placeholder="Ví dụ: Tiền ăn cả tháng, Xăng xe...">
+                    <label class="form-label" for="name" th:text="${editing} ? 'Tên phong bì' : 'Tên mục khác (chỉ nhập khi chọn Mục khác)'"></label>
+                    <input id="name" type="text" class="form-control" th:field="*{name}" placeholder="Nhập tên mục riêng..." maxlength="100" th:attr="readonly=${editing != true}">
+                    <div class="text-danger small" th:errors="*{name}"></div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Danh mục liên kết</label>
-                    <select class="form-select">
-                        <option value="">-- Chọn danh mục --</option>
+                    <label class="form-label" for="budgetPeriodId">Kỳ ngân sách</label>
+                    <select id="budgetPeriodId" class="form-select" th:field="*{budgetPeriodId}" required th:disabled="${envelopeRequest.budgetPeriodId != null}">
+                        <option value="">-- Chọn kỳ nháp --</option>
+                        <option th:each="budget : ${budgets}" th:value="${budget.id}" th:attr="data-income=${budget.totalIncome}" th:text="${budget.name + ' (' + budget.month + '/' + budget.year + ')'}"></option>
                     </select>
+                    <input th:if="${envelopeRequest.budgetPeriodId != null}" type="hidden" th:field="*{budgetPeriodId}">
+                    <div class="text-danger small" th:errors="*{budgetPeriodId}"></div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Hạn mức ngân sách (Số tiền phân bổ)</label>
-                    <input type="number" class="form-control" placeholder="0">
+                    <label class="form-label" for="categoryId">Danh mục liên kết</label>
+                    <select id="categoryId" class="form-select" th:field="*{categoryId}" required th:unless="${editing}">
+                        <option value="">-- Chọn danh mục --</option><option th:each="category : ${categories}" th:value="${category.id}" th:attr="data-custom=${category.name == 'Mục khác'}" th:text="${category.name}"></option>
+                    </select>
+                    <input th:if="${editing}" type="hidden" th:field="*{categoryId}">
+                    <div th:if="${editing}" class="form-control-plaintext" th:text="${editingCategoryName}"></div>
+                    <div class="text-danger small" th:errors="*{categoryId}"></div>
                 </div>
-                <button type="button" class="btn btn-primary">Lưu Phong Bì</button>
-                <a th:href="@{/envelopes}" class="btn btn-secondary ms-2">Hủy</a>
+                <div class="mb-3"><label class="form-label" for="allocatedAmount">Hạn mức phân bổ (₫)</label><input id="allocatedAmount" type="number" min="0" step="1" class="form-control" th:field="*{allocatedAmount}" placeholder="0" required><div class="text-danger small" th:errors="*{allocatedAmount}"></div><button id="suggestEnvelopeAmount" type="button" class="btn btn-sm btn-outline-primary mt-2">Gợi ý mức này từ lịch sử</button><div id="envelopeSuggestionMessage" class="form-text mt-1" aria-live="polite">Gợi ý dựa trên tỷ lệ phân bổ của tối đa 3 kỳ đã xác nhận.</div></div>
+                <button type="submit" class="btn btn-primary" th:text="${editing} ? 'Lưu thay đổi' : 'Lưu phong bì'">Lưu phong bì</button>
+                <a th:href="@{/envelopes(budgetId=${envelopeRequest.budgetPeriodId})}" class="btn btn-secondary ms-2">Hủy</a>
             </form>
         </div>
+        <script>
+            (() => {
+                const category = document.getElementById('categoryId');
+                const name = document.getElementById('name');
+                if (!category || !name) return;
+                const suggestButton = document.getElementById('suggestEnvelopeAmount');
+                const budget = document.getElementById('budgetPeriodId');
+                const allocatedAmount = document.getElementById('allocatedAmount');
+                const suggestionMessage = document.getElementById('envelopeSuggestionMessage');
+                const isEditing = document.querySelector('form[data-editing]')?.dataset.editing === 'true';
+
+                const applySuggestion = async () => {
+                    const selectedCategory = category.selectedOptions[0];
+                    const selectedBudget = budget.selectedOptions[0];
+                    if (!selectedCategory?.value || !selectedBudget?.value) { suggestionMessage.textContent = 'Chọn kỳ ngân sách và danh mục trước.'; return; }
+                    suggestButton.disabled = true; suggestionMessage.textContent = 'Đang tính gợi ý…';
+                    try {
+                        const response = await fetch(`/api/ai/budget-suggestions?income=${encodeURIComponent(selectedBudget.dataset.income || 0)}`);
+                        const suggestions = await response.json();
+                        if (!response.ok) throw new Error(suggestions.message || 'Không tải được gợi ý.');
+                        const suggested = suggestions[selectedCategory.textContent.trim()];
+                        if (suggested == null) { suggestionMessage.textContent = 'Chưa có lịch sử cho danh mục này. Bạn có thể tự nhập hạn mức.'; return; }
+                        allocatedAmount.value = suggested;
+                        suggestionMessage.textContent = `Đã điền mức gợi ý ${Number(suggested).toLocaleString('vi-VN')} ₫ từ lịch sử.`;
+                    } catch (error) { suggestionMessage.textContent = error.message; }
+                    finally { suggestButton.disabled = false; }
+                };
+                suggestButton?.addEventListener('click', applySuggestion);
+                if (!isEditing) category.addEventListener('change', () => {
+                    if (!allocatedAmount.value || Number(allocatedAmount.value) === 0) applySuggestion();
+                });
+
+                const isOtherSelected = () => category.selectedOptions[0]?.dataset.custom === 'true';
+                let wasOtherSelected = isOtherSelected();
+
+                const syncName = (clearCustomName) => {
+                    const otherSelected = isOtherSelected();
+                    name.readOnly = !otherSelected;
+                    name.required = otherSelected;
+                    if (otherSelected) {
+                        if (clearCustomName) name.value = '';
+                    } else {
+                        name.value = category.value ? category.selectedOptions[0].textContent.trim() : '';
+                    }
+                    wasOtherSelected = otherSelected;
+                };
+
+                category.addEventListener('change', () => syncName(!wasOtherSelected && isOtherSelected()));
+                syncName(false);
+            })();
+        </script>
     </main>
 </div>
 <div th:replace="~{fragments/footer :: footer}"></div>

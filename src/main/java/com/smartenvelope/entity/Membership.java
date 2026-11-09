@@ -3,12 +3,18 @@ package com.smartenvelope.entity;
 import com.smartenvelope.enums.MemberRole;
 import com.smartenvelope.enums.MembershipStatus;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import java.time.LocalDateTime;
 
 /**
  * Entity đại diện cho thành viên tham gia vào một workspace và quyền hạn tương ứng.
  * Phụ trách bởi: Thành viên 1 & Thành viên 2.
  */
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "memberships", uniqueConstraints = {
     @UniqueConstraint(columnNames = {"workspace_id", "user_id"})
@@ -38,9 +44,6 @@ public class Membership {
     @Column(name = "joined_at", nullable = false, updatable = false)
     private LocalDateTime joinedAt;
 
-    public Membership() {
-    }
-
     public Membership(Workspace workspace, User user, MemberRole role, MembershipStatus status) {
         this.workspace = workspace;
         this.user = user;
@@ -59,52 +62,5 @@ public class Membership {
         }
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Workspace getWorkspace() {
-        return workspace;
-    }
-
-    public void setWorkspace(Workspace workspace) {
-        this.workspace = workspace;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public MemberRole getRole() {
-        return role;
-    }
-
-    public void setRole(MemberRole role) {
-        this.role = role;
-    }
-
-    public MembershipStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(MembershipStatus status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getJoinedAt() {
-        return joinedAt;
-    }
-
-    public void setJoinedAt(LocalDateTime joinedAt) {
-        this.joinedAt = joinedAt;
-    }
 }
 

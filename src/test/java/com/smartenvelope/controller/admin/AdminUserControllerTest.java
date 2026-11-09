@@ -3,7 +3,6 @@ package com.smartenvelope.controller.admin;
 import com.smartenvelope.dto.admin.AdminUserResponse;
 import com.smartenvelope.entity.User;
 import com.smartenvelope.enums.Role;
-import com.smartenvelope.enums.UserStatus;
 import com.smartenvelope.service.CurrentUserService;
 import com.smartenvelope.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +21,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;

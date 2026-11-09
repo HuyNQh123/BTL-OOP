@@ -19,10 +19,10 @@
                 <div class="text-danger small" th:errors="*{targetAmount}"></div>
             </div>
             <div class="mb-3">
-                <label for="initialAmount" class="form-label">Số tiền gửi ban đầu (₫)</label>
+                <label for="initialAmount" class="form-label">Nạp thủ công ban đầu (₫)</label>
                 <input id="initialAmount" type="number" min="0" step="1" th:field="*{initialAmount}" class="form-control">
                 <div class="text-danger small" th:errors="*{initialAmount}"></div>
-                <div class="form-text">Khoản gửi ban đầu sẽ được ghi vào heo đất.</div>
+                <div class="form-text">Bạn tự nhập khoản muốn nạp; không cần chọn phong bì.</div>
             </div>
             <div class="mb-3">
                 <label for="targetDate" class="form-label">Hạn dự kiến</label>

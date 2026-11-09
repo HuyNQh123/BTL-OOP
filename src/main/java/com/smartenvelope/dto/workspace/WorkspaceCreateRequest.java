@@ -2,11 +2,17 @@ package com.smartenvelope.dto.workspace;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 /**
  * DTO nhận dữ liệu tạo mới Quỹ tài chính chung (Workspace).
  * Phụ trách bởi: Thành viên 1.
  */
+@Getter
+@Setter
+@NoArgsConstructor
 public class WorkspaceCreateRequest {
 
     @NotBlank(message = "Tên Quỹ tài chính không được để trống")
@@ -16,28 +22,10 @@ public class WorkspaceCreateRequest {
     @Size(max = 255, message = "Mô tả không được vượt quá 255 ký tự")
     private String description;
 
-    public WorkspaceCreateRequest() {
-    }
-
     public WorkspaceCreateRequest(String name, String description) {
         this.name = name;
         this.description = description;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 }
 

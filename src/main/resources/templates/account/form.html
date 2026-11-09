@@ -8,26 +8,28 @@
     <div th:replace="~{fragments/sidebar :: sidebar('accounts')}"></div>
     <main class="flex-grow-1 p-4">
         <h2>Thêm / Cập Nhật Tài Khoản</h2>
-        <!-- TODO: Thành viên 2 thiết kế form nhập tên tài khoản, loại tài khoản, số dư ban đầu -->
         <div class="card shadow-sm border-0 p-4 mt-3" style="max-width: 600px;">
-            <form>
+            <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+            <form th:action="@{/accounts}" th:object="${accountRequest}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                 <div class="mb-3">
-                    <label class="form-label">Tên tài khoản</label>
-                    <input type="text" class="form-control" placeholder="Ví dụ: Ví MoMo, Techcombank...">
+                    <label class="form-label" for="name">Tên tài khoản</label>
+                    <input id="name" type="text" th:field="*{name}" class="form-control" placeholder="Ví dụ: Ví tiền mặt, Techcombank..." required maxlength="100">
+                    <div class="text-danger small" th:errors="*{name}"></div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Loại tài khoản</label>
-                    <select class="form-select">
-                        <option value="CASH">Tiền mặt</option>
-                        <option value="BANK">Tài khoản ngân hàng</option>
-                        <option value="E_WALLET">Ví điện tử</option>
+                    <label class="form-label" for="type">Loại tài khoản</label>
+                    <select id="type" th:field="*{type}" class="form-select">
+                        <option th:each="type : ${accountTypes}" th:value="${type}" th:text="${type == T(com.smartenvelope.enums.AccountType).CASH ? 'Tiền mặt' : (type == T(com.smartenvelope.enums.AccountType).BANK ? 'Ngân hàng' : (type == T(com.smartenvelope.enums.AccountType).CREDIT ? 'Tín dụng' : 'Tiết kiệm'))}"></option>
                     </select>
+                    <div class="text-danger small" th:errors="*{type}"></div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Số dư ban đầu</label>
-                    <input type="number" class="form-control" placeholder="0">
+                    <label class="form-label" for="initialBalance">Số dư ban đầu</label>
+                    <input id="initialBalance" type="number" min="0" step="1" th:field="*{initialBalance}" class="form-control" placeholder="0" required>
+                    <div class="text-danger small" th:errors="*{initialBalance}"></div>
                 </div>
-                <button type="button" class="btn btn-primary">Lưu Tài Khoản</button>
+                <button type="submit" class="btn btn-primary">Lưu Tài Khoản</button>
                 <a th:href="@{/accounts}" class="btn btn-secondary ms-2">Hủy</a>
             </form>
         </div>

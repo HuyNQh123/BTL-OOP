@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/resources :: head('Cài đặt tài chính')}"></head>
+<body>
+<div class="d-flex">
+    <div th:replace="~{fragments/sidebar :: sidebar('settings')}"></div>
+    <main id="app-main" class="flex-grow-1 p-4">
+        <h1 class="h2">Cài đặt tài chính</h1>
+        <p class="text-muted">Thiết lập ngày nhận lương và các giờ nhắc nhở hằng ngày.</p>
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+        <section th:unless="${editMode}" class="card border-0 shadow-sm p-4 mt-3" style="max-width: 720px"
+                 aria-labelledby="finance-settings-summary-title">
+            <h2 id="finance-settings-summary-title" class="h5 mb-4">Cài đặt hiện tại</h2>
+            <dl class="row mb-4">
+                <dt class="col-sm-7">Ngày nhận lương mỗi tháng</dt>
+                <dd class="col-sm-5" th:text="${settings.salaryDay}">5</dd>
+
+                <dt class="col-sm-7">Thu nhập theo giờ</dt>
+                <dd class="col-sm-5" th:text="|${settings.hourlyWage} ₫|">25,000 ₫</dd>
+
+                <dt class="col-sm-7">Mức lương dự kiến mỗi tháng</dt>
+                <dd class="col-sm-5" th:text="|${settings.expectedSalary} ₫|">5,000,000 ₫</dd>
+
+                <dt class="col-sm-7">Giờ nhắc phân bổ ngân sách</dt>
+                <dd class="col-sm-5" th:text="${#temporals.format(settings.budgetReminderTime, 'HH:mm')}">10:00</dd>
+
+                <dt class="col-sm-7">Giờ nhắc kết thúc chi tiêu trong ngày</dt>
+                <dd class="col-sm-5" th:text="${#temporals.format(settings.dailyReminderTime, 'HH:mm')}">22:00</dd>
+            </dl>
+            <div>
+                <a th:href="@{/settings/finance(edit=true)}" class="btn btn-primary">Sửa</a>
+            </div>
+        </section>
+
+        <form th:if="${editMode}" th:action="@{/settings/finance}" th:object="${settings}" method="post"
+              class="card border-0 shadow-sm p-4 mt-3" style="max-width: 720px">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <div class="mb-3">
+                <label for="salaryDay" class="form-label">Ngày nhận lương mỗi tháng</label>
+                <input id="salaryDay" type="number" min="1" max="31" th:field="*{salaryDay}" class="form-control" required>
+                <div class="form-text">Nếu tháng đó không có ngày này, ứng dụng tính ngày cuối tháng.</div>
+                <div class="text-danger small" th:errors="*{salaryDay}"></div>
+            </div>
+            <div class="mb-3">
+                <label for="hourlyWage" class="form-label">Thu nhập theo giờ (₫)</label>
+                <input id="hourlyWage" type="number" min="0" step="1" th:field="*{hourlyWage}" class="form-control" required>
+                <div class="form-text">Dùng để ước tính số giờ làm tương đương cho khoản chi không thiết yếu.</div>
+                <div class="text-danger small" th:errors="*{hourlyWage}"></div>
+            </div>
+            <div class="mb-3">
+                <label for="expectedSalary" class="form-label">Mức lương dự kiến mỗi tháng (₫)</label>
+                <input id="expectedSalary" type="number" min="0" step="1" th:field="*{expectedSalary}" class="form-control" required>
+                <div class="form-text">Dùng để gợi ý số tiền khi lập ngân sách; giao dịch thu nhập thực tế vẫn do bạn ghi nhận.</div>
+                <div class="text-danger small" th:errors="*{expectedSalary}"></div>
+            </div>
+            <div class="mb-3">
+                <label for="budgetReminderTime" class="form-label">Giờ nhắc phân bổ ngân sách</label>
+                <input id="budgetReminderTime" type="time" th:field="*{budgetReminderTime}" class="form-control" required>
+                <div class="form-text">Nếu ngân sách tháng chưa được phân bổ và xác nhận, ứng dụng sẽ nhắc mỗi giờ đến giờ dừng chi tiêu.</div>
+                <div class="text-danger small" th:errors="*{budgetReminderTime}"></div>
+            </div>
+            <div class="mb-3">
+                <label for="dailyReminderTime" class="form-label">Giờ nhắc kết thúc chi tiêu trong ngày</label>
+                <input id="dailyReminderTime" type="time" th:field="*{dailyReminderTime}" class="form-control" required>
+                <div class="form-text">Đến giờ này, SmartEnvelope gửi lời nhắc rà soát và dừng chi tiêu. Giao dịch không bị tự động khóa.</div>
+                <div class="text-danger small" th:errors="*{dailyReminderTime}"></div>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Lưu</button>
+                <a th:href="@{/settings/finance}" class="btn btn-outline-secondary">Hủy</a>
+            </div>
+        </form>
+    </main>
+</div>
+<div th:replace="~{fragments/footer :: footer}"></div>
+<th:block th:replace="~{fragments/resources :: scripts}"></th:block>
+</body>
+</html>

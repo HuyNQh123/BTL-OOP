@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +33,9 @@ public class AlertService {
     private final BudgetPeriodRepository budgetRepository;
     private final EnvelopeRepository envelopeRepository;
     private final NotificationRepository notificationRepository;
+    private final EmailService emailService;
+    private final UserFinanceSettingsRepository settingsRepository;
+    private final WorkspaceRepository workspaceRepository;
 
     @Transactional
     public List<Notification> getNotifications() {
@@ -39,6 +44,12 @@ public class AlertService {
 
         return notificationRepository.findByUserIdOrderByCreatedAtDesc(
                 currentUserService.getCurrentUserId());
+    }
+
+    public long getUnreadNotificationCount() {
+        Long userId = currentUserService.getCurrentUserId();
+        return notificationRepository.countByUserIdAndStatus(userId, NotificationStatus.PENDING)
+                + notificationRepository.countByUserIdAndStatus(userId, NotificationStatus.SENT);
     }
 
     @Transactional
@@ -61,7 +72,7 @@ public class AlertService {
 
         Long workspaceId = workspaceContext.getCurrentWorkspaceId();
 
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Ho_Chi_Minh"));
 
         LocalDateTime startOfDay = today.atStartOfDay();
 
@@ -103,9 +114,65 @@ public class AlertService {
 
                     notification.setStatus(NotificationStatus.SENT);
 
-                    existing.add(notificationRepository.save(notification));
+                    Notification saved = notificationRepository.save(notification);
+                    existing.add(saved);
+                    emailService.sendNotificationEmail(saved);
                 }
             }
+        }
+    }
+
+    /** Runs once per minute; settings control reminder times and reminders are deduplicated per hour/day. */
+    @Transactional
+    public void runScheduledReminders() {
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")).withSecond(0).withNano(0);
+        LocalDate today = now.toLocalDate();
+
+        for (UserFinanceSettings settings : settingsRepository.findAll()) {
+            User user = settings.getUser();
+            LocalTime budgetReminder = settings.getBudgetReminderTime() == null
+                    ? LocalTime.of(10, 0) : settings.getBudgetReminderTime();
+            LocalTime stopSpendingReminder = settings.getDailyReminderTime() == null
+                    ? LocalTime.of(22, 0) : settings.getDailyReminderTime();
+
+            if (isHourlyReminderTime(now.toLocalTime(), budgetReminder, stopSpendingReminder)
+                    && !hasConfirmedBudget(user, today)) {
+                LocalDateTime hourStart = now.withMinute(0);
+                createReminderUnlessExists(user, NotificationType.BUDGET_REMINDER,
+                        "Cần phân bổ ngân sách", "Ngân sách tháng này chưa được phân bổ và xác nhận. Hãy hoàn tất kế hoạch chi tiêu.",
+                        "/budgets", hourStart, hourStart.plusHours(1));
+            }
+
+            if (now.toLocalTime().getHour() == stopSpendingReminder.getHour()
+                    && now.toLocalTime().getMinute() == stopSpendingReminder.getMinute()) {
+                LocalDateTime dayStart = today.atStartOfDay();
+                createReminderUnlessExists(user, NotificationType.DAILY_CLOSE,
+                        "Đến giờ kết thúc chi tiêu", "Hãy dừng các khoản chi trong ngày và rà soát lại giao dịch đã phát sinh.",
+                        "/transactions", dayStart, dayStart.plusDays(1));
+            }
+        }
+    }
+
+    private boolean isHourlyReminderTime(LocalTime now, LocalTime reminder, LocalTime stop) {
+        if (!now.isBefore(reminder) || !now.isBefore(stop) || now.getMinute() != reminder.getMinute()) return false;
+        return (now.toSecondOfDay() - reminder.toSecondOfDay()) % 3600 == 0;
+    }
+
+    private boolean hasConfirmedBudget(User user, LocalDate today) {
+        return workspaceRepository.findByOwnerIdAndType(user.getId(), WorkspaceType.PERSONAL).stream()
+                .map(workspace -> budgetRepository.findByWorkspaceIdAndMonthAndYear(workspace.getId(),
+                        today.getMonthValue(), today.getYear()).orElse(null))
+                .anyMatch(budget -> budget != null
+                        && (budget.getStatus() == BudgetStatus.CONFIRMED || budget.getStatus() == BudgetStatus.CLOSED));
+    }
+
+    private void createReminderUnlessExists(User user, NotificationType type, String title, String message,
+            String actionUrl, LocalDateTime start, LocalDateTime end) {
+        if (!notificationRepository.existsByUserIdAndTypeAndCreatedAtBetween(user.getId(), type, start, end)) {
+            Notification notification = new Notification(user, type, title, message, actionUrl);
+            notification.setStatus(NotificationStatus.SENT);
+            Notification saved = notificationRepository.save(notification);
+            emailService.sendNotificationEmail(saved);
         }
     }
 

@@ -4,7 +4,6 @@ import com.smartenvelope.entity.Membership;
 import com.smartenvelope.enums.MemberRole;
 import com.smartenvelope.enums.MembershipStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +12,6 @@ import java.util.Optional;
  * Repository thao tác dữ liệu với bảng memberships. Phụ trách bởi: Thành viên 1
  * & Thành viên 2.
  */
-@Repository
 public interface MembershipRepository extends JpaRepository<Membership, Long> {
 
     List<Membership> findByWorkspaceId(Long workspaceId);

@@ -16,8 +16,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -43,13 +43,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class Member1FormsUiTest {
     @Autowired MockMvc mockMvc;
     @Autowired PasswordEncoder passwordEncoder;
-    @MockBean CurrentUserService currentUserService;
-    @MockBean WorkspaceContextService workspaceContextService;
-    @MockBean CustomUserDetailsService customUserDetailsService;
-    @MockBean UserService userService;
-    @MockBean CategoryService categoryService;
-    @MockBean WorkspaceService workspaceService;
-    @MockBean WorkspaceInvitationService invitationService;
+    @MockitoBean CurrentUserService currentUserService;
+    @MockitoBean WorkspaceContextService workspaceContextService;
+    @MockitoBean CustomUserDetailsService customUserDetailsService;
+    @MockitoBean AuthService authService;
+    @MockitoBean UserService userService;
+    @MockitoBean CategoryService categoryService;
+    @MockitoBean WorkspaceService workspaceService;
+    @MockitoBean WorkspaceInvitationService invitationService;
     User user;
     Workspace workspace;
     WorkspaceInvitation invitation;
@@ -101,7 +102,7 @@ class Member1FormsUiTest {
                 .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
         assertThat(html).contains("id=\"fullName-error\"", "id=\"email-error\"", "aria-invalid=\"true\"");
         writePreview("auth-register-invalid", html);
-        verify(userService, never()).register(any());
+        verify(authService, never()).register(any());
     }
 
     @Test
@@ -110,13 +111,13 @@ class Member1FormsUiTest {
         mockMvc.perform(post("/register").with(csrf()).param("fullName", "Người kiểm thử")
                         .param("email", "kiemthu@example.test").param("password", "matkhau-kiemthu").param("confirmPassword", "khong-trung"))
                 .andExpect(model().attributeHasFieldErrors("registerRequest", "confirmPassword"));
-        verify(userService, never()).register(any());
+        verify(authService, never()).register(any());
     }
 
     @Test
     @DisplayName("Email trùng vẫn hiển thị lỗi server của trường email")
     void duplicateEmail() throws Exception {
-        when(userService.existsByEmail("kiemthu@example.test")).thenReturn(true);
+        when(authService.existsByEmail("kiemthu@example.test")).thenReturn(true);
         mockMvc.perform(post("/register").with(csrf()).param("fullName", "Người kiểm thử")
                         .param("email", "kiemthu@example.test").param("password", "matkhau-kiemthu").param("confirmPassword", "matkhau-kiemthu"))
                 .andExpect(model().attributeHasFieldErrors("registerRequest", "email"));
@@ -128,7 +129,7 @@ class Member1FormsUiTest {
         mockMvc.perform(post("/register").with(csrf()).param("fullName", "Người kiểm thử")
                         .param("email", "kiemthu@example.test").param("password", "matkhau-kiemthu").param("confirmPassword", "matkhau-kiemthu"))
                 .andExpect(redirectedUrl("/login?registered=true"));
-        verify(userService).register(any(RegisterRequest.class));
+        verify(authService).register(any(RegisterRequest.class));
     }
 
     @Test

@@ -14,7 +14,6 @@ import com.smartenvelope.exception.ResourceNotFoundException;
 import com.smartenvelope.repository.AccountRepository;
 import com.smartenvelope.repository.MembershipRepository;
 import com.smartenvelope.repository.WorkspaceRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +36,6 @@ public class WorkspaceService {
     private final WorkspaceContextService workspaceContextService;
     private final AccountRepository accountRepository;
 
-    @Autowired
     public WorkspaceService(WorkspaceRepository workspaceRepository,
             MembershipRepository membershipRepository,
             WorkspaceContextService workspaceContextService, AccountRepository accountRepository) {
@@ -165,7 +163,7 @@ public class WorkspaceService {
      * Lấy danh sách thành viên trong Workspace kèm trạng thái và quyền quản lý.
      */
     public List<WorkspaceMemberDTO> getWorkspaceMembers(Long workspaceId, Long currentUserId) {
-        Workspace workspace = getWorkspaceByIdAndCheckAccess(workspaceId, currentUserId);
+        getWorkspaceByIdAndCheckAccess(workspaceId, currentUserId);
         MemberRole currentUserRole = getUserRoleInWorkspace(workspaceId, currentUserId);
 
         List<Membership> memberships = membershipRepository.findByWorkspaceIdAndStatus(workspaceId,
@@ -288,7 +286,7 @@ public class WorkspaceService {
      */
     @Transactional
     public void removeMember(Long workspaceId, Long targetMembershipId, Long currentUserId) {
-        Workspace workspace = getWorkspaceByIdAndCheckAccess(workspaceId, currentUserId);
+        getWorkspaceByIdAndCheckAccess(workspaceId, currentUserId);
         MemberRole currentUserRole = getUserRoleInWorkspace(workspaceId, currentUserId);
 
         Membership targetMembership = membershipRepository.findById(targetMembershipId)

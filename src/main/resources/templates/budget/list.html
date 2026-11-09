@@ -12,24 +12,43 @@
 
         <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
         <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+        <div class="alert alert-info" th:if="${!#lists.isEmpty(budgets)}">Sau khi ghi nhận thu nhập, chọn <strong>Phân bổ ngay</strong> ở kỳ nháp. Tạo phong bì cho các khoản chi; nút <strong>Xác nhận</strong> bật khi đã phân bổ đủ toàn bộ tiền khả dụng.</div>
 
         <div class="card shadow-sm border-0 p-4" th:if="${#lists.isEmpty(budgets)}">
             <p class="text-muted mb-0">Chưa có kỳ ngân sách nào.</p>
         </div>
         <div class="table-responsive" th:unless="${#lists.isEmpty(budgets)}">
             <table class="table align-middle">
-                <thead><tr><th>Kỳ</th><th>Thu nhập</th><th>Đã phân bổ</th><th>Còn lại</th><th>Trạng thái</th><th></th></tr></thead>
+                <thead><tr><th>Kỳ</th><th>Tiền khả dụng</th><th>Đã phân bổ</th><th>Còn cần phân bổ</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
                 <tbody>
                 <tr th:each="budget : ${budgets}">
-                    <td><strong th:text="${budget.name}"></strong><div class="small text-muted" th:text="${budget.month + '/' + budget.year}"></div></td>
+                    <td><strong th:text="${budget.name}"></strong><div class="small text-muted" th:text="${budget.month + '/' + budget.year}"></div>
+                        <div class="progress mt-2" style="height: 8px" role="progressbar" aria-label="Tiến độ phân bổ"
+                             th:attr="aria-valuenow=${budget.allocationPercent}, aria-valuemin=0, aria-valuemax=100">
+                            <div class="progress-bar" th:style="'width:' + ${budget.allocationPercent} + '%'" th:classappend="${budget.allocationPercent == 100} ? 'bg-success' : ''"></div>
+                        </div>
+                        <small class="text-muted" th:text="${budget.allocationPercent} + '% đã phân bổ'"></small>
+                    </td>
                     <td th:text="${#numbers.formatDecimal(budget.totalIncome, 0, 'COMMA', 0, 'POINT')} + ' ₫'"></td>
                     <td th:text="${#numbers.formatDecimal(budget.totalAllocated, 0, 'COMMA', 0, 'POINT')} + ' ₫'"></td>
-                    <td th:text="${#numbers.formatDecimal(budget.remainingBudget, 0, 'COMMA', 0, 'POINT')} + ' ₫'"></td>
+                    <td>
+                        <span th:if="${budget.remainingBudget > 0}" class="text-warning-emphasis" th:text="${#numbers.formatDecimal(budget.remainingBudget, 0, 'COMMA', 0, 'POINT')} + ' ₫ cần phân bổ'"></span>
+                        <span th:if="${budget.remainingBudget == 0}" class="text-success">Đã phân bổ đủ</span>
+                        <span th:if="${budget.remainingBudget < 0}" class="text-danger" th:text="${#numbers.formatDecimal(budget.remainingBudget.abs(), 0, 'COMMA', 0, 'POINT')} + ' ₫ phân bổ vượt'"></span>
+                    </td>
                     <td><span class="badge text-bg-secondary" th:text="${budget.status}"></span></td>
                     <td>
-                        <form th:if="${budget.status.name() == 'DRAFT'}" th:action="@{/budgets/{id}/confirm(id=${budget.id})}" method="post">
-                            <button type="submit" class="btn btn-sm btn-outline-primary">Xác nhận</button>
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+                        <a th:href="@{/envelopes(budgetId=${budget.id})}" class="btn btn-sm btn-outline-primary"
+                           th:text="${budget.status.name() == 'DRAFT'} ? 'Phân bổ ngay' : 'Xem phong bì'">Phân bổ ngay</a>
+                        <a th:if="${budget.status.name() == 'DRAFT'}" th:href="@{/budgets/{id}/edit(id=${budget.id})}" class="btn btn-sm btn-outline-secondary">Sửa</a>
+                        <form class="mb-0" th:if="${budget.status.name() == 'DRAFT'}" th:action="@{/budgets/{id}/confirm(id=${budget.id})}" method="post">
+                            <button type="submit" class="btn btn-sm btn-primary" th:disabled="${!budget.canConfirm()}">Xác nhận</button>
                         </form>
+                        <form class="mb-0" th:if="${budget.status.name() == 'DRAFT'}" th:action="@{/budgets/{id}/delete(id=${budget.id})}" method="post" onsubmit="return confirm('Xóa kỳ nháp này và các phong bì chưa có lịch sử?')">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Xóa</button>
+                        </form>
+                        </div>
                     </td>
                 </tr>
                 </tbody>

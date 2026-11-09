@@ -20,7 +20,7 @@ public record BudgetRequest(
         Integer year,
 
         @NotNull(message = "Vui lòng nhập tổng thu nhập.")
-        @DecimalMin(value = "0.0", message = "Thu nhập không được âm.")
+        @DecimalMin(value = "1", message = "Tiền khả dụng phải lớn hơn 0.")
         BigDecimal totalIncome,
 
         RolloverPolicy rolloverPolicy) {

@@ -21,6 +21,7 @@
                     <li th:replace="~{fragments/sidebar :: navItem('/savings', 'Mục tiêu tiết kiệm', 'bi-piggy-bank', ${activeMenu == 'savings'})}"></li>
                     <li th:replace="~{fragments/sidebar :: navItem('/reports', 'Báo cáo', 'bi-bar-chart', ${activeMenu == 'reports'})}"></li>
                     <li th:replace="~{fragments/sidebar :: navItem('/alerts', 'Cảnh báo chi tiêu', 'bi-bell', ${activeMenu == 'alerts' or activeMenu == 'notifications'})}"></li>
+                    <li th:replace="~{fragments/sidebar :: navItem('/settings/finance', 'Cài đặt tài chính', 'bi-gear', ${activeMenu == 'settings'})}"></li>
                 </ul>
                 <div class="sidebar-heading">Không gian làm việc</div>
                 <ul class="nav flex-column">

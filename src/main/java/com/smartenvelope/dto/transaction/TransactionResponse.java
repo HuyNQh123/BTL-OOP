@@ -1,10 +1,15 @@
 package com.smartenvelope.dto.transaction;
 
-/**
- * DTO trả về thông tin chi tiết một giao dịch để hiển thị trên bảng lịch sử giao dịch.
- * Phụ trách bởi: Thành viên 3.
- */
-public class TransactionResponse {
-    // TODO: Thành viên 3 khai báo id, accountName, envelopeName, categoryName, amount, type, transactionDate, note
+import com.smartenvelope.entity.Transaction;
+import com.smartenvelope.enums.TransactionType;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+public record TransactionResponse(Long id, String accountName, String envelopeName, String categoryName,
+        BigDecimal amount, TransactionType type, LocalDate transactionDate, String note) {
+    public TransactionResponse(Transaction t) {
+        this(t.getId(), t.getAccount().getName(), t.getEnvelope() == null ? null : t.getEnvelope().getName(),
+                t.getCategory().getName(), t.getAmount(), t.getType(), t.getTransactionDate(), t.getNote());
+    }
 }
 

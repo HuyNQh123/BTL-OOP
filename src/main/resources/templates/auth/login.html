@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="~{fragments/resources :: head('Đăng nhập')}">
+    </head>
+    <body class="auth-page">
+        <main class="auth-container">
+            <a class="auth-brand" th:href="@{/login}">
+                <span class="brand-icon" aria-hidden="true">
+                    <i class="bi bi-envelope-paper">
+                    </i>
+                </span>
+                SmartEnvelope
+            </a>
+            <section class="auth-card" aria-labelledby="auth-title">
+                <h1 id="auth-title">
+                    Đăng nhập
+                </h1>
+                <p class="page-description mb-4">
+                    Truy cập quỹ và quản lý tài chính của bạn.
+                </p>
+                <div th:if="${param.error}" class="alert alert-danger" role="alert">
+                    Email, tên đăng nhập hoặc mật khẩu không chính xác, hoặc tài khoản đã bị khóa.
+                </div>
+                <div th:if="${param.logout}" class="alert alert-info" role="status">
+                    Bạn đã đăng xuất an toàn.
+                </div>
+                <div th:if="${param.registered} or ${successMessage}" class="alert alert-success" role="status"
+             th:text="${successMessage != null ? successMessage : 'Đăng ký thành công. Vui lòng đăng nhập.'}">
+                    Đăng ký thành công.
+                </div>
+                <form th:action="@{/login}" method="post" data-submit-feedback>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">
+                            Email hoặc tên đăng nhập
+                        </label>
+                        <input type="text" id="email" name="email" class="form-control" autocomplete="username" required autofocus>
+                    </div>
+                    <div class="mb-4">
+                        <label for="password" class="form-label">
+                            Mật khẩu
+                        </label>
+                        <div class="password-control">
+                            <input type="password" id="password" name="password" class="form-control" autocomplete="current-password" required>
+                            <button type="button" class="btn btn-ghost password-toggle" data-password-toggle="password" aria-controls="password" aria-pressed="false" aria-label="Hiện mật khẩu">
+                                <i class="bi bi-eye" aria-hidden="true">
+                                </i>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100" data-loading-button>
+                        <span class="btn-label">
+                            Đăng nhập
+                        </span>
+                        <span class="spinner-border spinner-border-sm loading-spinner" aria-hidden="true">
+                        </span>
+                    </button>
+                </form>
+                <p class="auth-link">
+                    Chưa có tài khoản?
+                    <a th:href="@{/register}">
+                        Đăng ký
+                    </a>
+                </p>
+            </section>
+        </main>
+        <th:block th:replace="~{fragments/resources :: scripts}">
+        </th:block>
+    </body>
+</html>

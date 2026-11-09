@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main :: layout('Tạo quỹ chung', 'workspaces', ~{::#main-content}, ~{}, ~{})}">
+    <body>
+        <div id="main-content" class="member-page">
+            <div class="page-header">
+                <div>
+                    <h1>
+                        Tạo quỹ chung
+                    </h1>
+                    <p class="page-description">
+                        Các trường có dấu * là bắt buộc.
+                    </p>
+                </div>
+                <div class="page-actions">
+                </div>
+            </div>
+            <section class="member-section form-section">
+                <form th:action="@{/workspaces/create}" th:object="${workspaceForm}" method="post" data-submit-feedback>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">
+                            Tên quỹ
+                            <span aria-hidden="true">
+                                *
+                            </span>
+                        </label>
+                        <input id="name" type="text" th:field="*{name}" class="form-control" required maxlength="100" th:classappend="${#fields.hasErrors('name')} ? 'is-invalid' : ''" th:attr="aria-invalid=${#fields.hasErrors('name')}" aria-describedby="name-error">
+                        <div class="invalid-feedback d-block" id="name-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">
+                            Mô tả
+                            <span class="text-muted">
+                                (tùy chọn)
+                            </span>
+                        </label>
+                        <textarea id="description" th:field="*{description}" class="form-control" maxlength="255" rows="3" aria-describedby="description-error" th:classappend="${#fields.hasErrors('description')} ? 'is-invalid' : ''" th:attr="aria-invalid=${#fields.hasErrors('description')}">
+                        </textarea>
+                        <div id="description-error" class="invalid-feedback d-block" th:if="${#fields.hasErrors('description')}" th:errors="*{description}">
+                        </div>
+                    </div>
+                    <p class="form-text mb-4">
+                        Bạn là chủ sở hữu quỹ mới và có thể mời, phân quyền thành viên sau khi tạo.
+                    </p>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" data-loading-button>
+                            <span class="btn-label">
+                                Tạo quỹ
+                            </span>
+                            <span class="spinner-border spinner-border-sm loading-spinner" aria-hidden="true">
+                            </span>
+                        </button>
+                        <a th:href="@{/workspaces}" class="btn btn-outline-secondary">
+                            Hủy
+                        </a>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main :: layout('Lời mời tham gia quỹ', 'invitations', ~{::#main-content}, ~{}, ~{})}">
+    <body>
+        <div id="main-content" class="member-page">
+            <div class="page-header">
+                <div>
+                    <h1>
+                        Lời mời tham gia quỹ
+                    </h1>
+                    <p class="page-description">
+                        Kiểm tra thông tin trước khi tham gia.
+                    </p>
+                </div>
+                <div class="page-actions">
+                </div>
+            </div>
+            <section class="member-section form-section">
+                <h2 class="workspace-title" th:text="${invitation.workspace.name}">
+                    Tên quỹ
+                </h2>
+                <p class="text-muted" th:if="${invitation.workspace.description != null}" th:text="${invitation.workspace.description}">
+                </p>
+                <dl class="detail-grid">
+                    <div>
+                        <dt>
+                            Người mời
+                        </dt>
+                        <dd th:text="${invitation.invitedBy.fullName}">
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>
+                            Email nhận lời mời
+                        </dt>
+                        <dd th:text="${invitation.email}">
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>
+                            Vai trò
+                        </dt>
+                        <dd>
+                            <span th:replace="~{fragments/member-ui :: roleLabel(${invitation.role})}">
+                            </span>
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>
+                            Hết hạn
+                        </dt>
+                        <dd th:text="${#temporals.format(invitation.expiresAt, 'dd/MM/yyyy HH:mm')}">
+                        </dd>
+                    </div>
+                </dl>
+                <div th:if="${isEmailMatch}">
+                    <form th:action="@{/invitations/join/accept}" method="post">
+                        <input type="hidden" name="token" th:value="${invitation.token}">
+                        <button type="submit" class="btn btn-primary">
+                            Chấp nhận và tham gia
+                        </button>
+                    </form>
+                </div>
+                <div th:unless="${isEmailMatch}" class="alert alert-warning" role="alert">
+                    <strong>
+                        Email tài khoản không khớp lời mời.
+                    </strong>
+                    <p class="mb-0">
+                        Bạn đang đăng nhập bằng
+                        <span th:text="${currentUser.email}">
+                        </span>
+                        . Hãy đăng xuất từ menu tài khoản và đăng nhập bằng email nhận lời mời.
+                    </p>
+                </div>
+                <a th:href="@{/workspaces}" class="d-inline-block mt-3">
+                    Quay lại quỹ của bạn
+                </a>
+            </section>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main :: layout('Thông tin người dùng', 'admin-users', ~{::#main-content}, ~{}, ~{})}">
+    <body>
+        <div id="main-content" class="member-page">
+            <a th:href="@{/admin/users}" class="back-link">
+                Quay lại danh sách người dùng
+            </a>
+            <div class="page-header">
+                <div>
+                    <h1>
+                        Thông tin người dùng
+                    </h1>
+                    <p class="page-description" th:text="'Tài khoản #' + ${userDetail.id}">
+                    </p>
+                </div>
+            </div>
+            <section class="member-section">
+                <div class="section-heading">
+                    <h2 th:text="${userDetail.fullName}">
+                        Họ và tên
+                    </h2>
+                    <div class="inline-meta">
+                        <span th:replace="~{fragments/member-ui :: roleLabel(${userDetail.role})}">
+                        </span>
+                        <span th:replace="~{fragments/member-ui :: userStatus(${userDetail.status})}">
+                        </span>
+                    </div>
+                </div>
+                <dl class="detail-grid">
+                    <div>
+                        <dt>
+                            Email
+                        </dt>
+                        <dd th:text="${userDetail.email}">
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>
+                            Tên đăng nhập
+                        </dt>
+                        <dd th:text="${userDetail.username}">
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>
+                            Số điện thoại
+                        </dt>
+                        <dd th:text="${userDetail.phone != null and !userDetail.phone.isEmpty() ? userDetail.phone : 'Chưa cập nhật'}">
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>
+                            Số quỹ tham gia
+                        </dt>
+                        <dd th:text="${userDetail.workspaceCount}">
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>
+                            Ngày đăng ký
+                        </dt>
+                        <dd th:text="${userDetail.createdAt != null ? #temporals.format(userDetail.createdAt, 'dd/MM/yyyy HH:mm') : 'Chưa cập nhật'}">
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>
+                            Cập nhật gần nhất
+                        </dt>
+                        <dd th:text="${userDetail.updatedAt != null ? #temporals.format(userDetail.updatedAt, 'dd/MM/yyyy HH:mm') : 'Chưa cập nhật'}">
+                        </dd>
+                    </div>
+                </dl>
+                <div class="form-actions" th:if="${currentAdminId != null and currentAdminId != userDetail.id}">
+                    <form th:if="${userDetail.status != T(com.smartenvelope.enums.UserStatus).LOCKED}" th:action="@{/admin/users/{id}/lock(id=${userDetail.id})}" method="post" onsubmit="return confirm('Khóa tài khoản này? Người dùng sẽ mất quyền đăng nhập.');">
+                        <button type="submit" class="btn btn-outline-danger">
+                            Khóa tài khoản
+                        </button>
+                    </form>
+                    <form th:if="${userDetail.status == T(com.smartenvelope.enums.UserStatus).LOCKED}" th:action="@{/admin/users/{id}/unlock(id=${userDetail.id})}" method="post" onsubmit="return confirm('Mở khóa tài khoản này?');">
+                        <button type="submit" class="btn btn-outline-primary">
+                            Mở khóa tài khoản
+                        </button>
+                    </form>
+                </div>
+                <p th:if="${currentAdminId != null and currentAdminId == userDetail.id}" class="form-text">
+                    Đây là tài khoản quản trị viên bạn đang sử dụng.
+                </p>
+                <p class="form-text mb-0">
+                    Mật khẩu được bảo vệ và không hiển thị cho quản trị viên.
+                </p>
+            </section>
+        </div>
+    </body>
+</html>

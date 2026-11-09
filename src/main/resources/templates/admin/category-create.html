@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main :: layout('Thêm danh mục', 'admin-categories', ~{::#main-content}, ~{}, ~{})}">
+    <body>
+        <div id="main-content" class="member-page">
+            <a th:href="@{/admin/categories}" class="back-link">
+                Quay lại danh mục hệ thống
+            </a>
+            <div class="page-header">
+                <div>
+                    <h1>
+                        Thêm danh mục
+                    </h1>
+                    <p class="page-description">
+                        Danh mục thu nhập và chi tiêu dùng chung.
+                    </p>
+                </div>
+            </div>
+            <section class="member-section form-section">
+                <form th:action="@{/admin/categories/create}" th:object="${categoryRequest}" method="post" data-submit-feedback>
+                    <th:block th:replace="~{fragments/member-ui :: categoryFields}">
+                    </th:block>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" data-loading-button>
+                            <span class="btn-label">
+                                Lưu danh mục
+                            </span>
+                            <span class="spinner-border spinner-border-sm loading-spinner" aria-hidden="true">
+                            </span>
+                        </button>
+                        <a th:href="@{/admin/categories}" class="btn btn-outline-secondary">
+                            Hủy
+                        </a>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </body>
+</html>

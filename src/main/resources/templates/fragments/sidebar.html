@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<!-- Giữ chữ ký sidebar(activeMenu); ghép header tại đây cho cả hai cơ chế layout. -->
+<th:block th:fragment="sidebar(activeMenu)">
+    <header th:replace="~{fragments/header :: header}"></header>
+    <aside id="sidebarMenu" class="sidebar app-sidebar offcanvas offcanvas-start" tabindex="-1"
+           aria-labelledby="sidebarTitle" data-bs-scroll="false">
+        <div class="offcanvas-header">
+            <h2 class="offcanvas-title" id="sidebarTitle">Điều hướng</h2>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Đóng menu điều hướng"></button>
+        </div>
+        <div class="offcanvas-body">
+            <nav aria-label="Điều hướng chính">
+                <div class="sidebar-heading">Tài chính</div>
+                <ul class="nav flex-column">
+                    <li th:replace="~{fragments/sidebar :: navItem('/dashboard', 'Tổng quan', 'bi-grid-1x2', ${activeMenu == 'dashboard'})}"></li>
+                    <li th:replace="~{fragments/sidebar :: navItem('/accounts', 'Tài khoản', 'bi-credit-card-2-front', ${activeMenu == 'accounts'})}"></li>
+                    <li th:replace="~{fragments/sidebar :: navItem('/transactions', 'Giao dịch', 'bi-arrow-left-right', ${activeMenu == 'transactions'})}"></li>
+                    <li th:replace="~{fragments/sidebar :: navItem('/envelopes', 'Phong bì', 'bi-envelope', ${activeMenu == 'envelopes'})}"></li>
+                    <li th:replace="~{fragments/sidebar :: navItem('/budgets', 'Ngân sách', 'bi-pie-chart', ${activeMenu == 'budgets'})}"></li>
+                    <li th:replace="~{fragments/sidebar :: navItem('/savings', 'Mục tiêu tiết kiệm', 'bi-piggy-bank', ${activeMenu == 'savings'})}"></li>
+                    <li th:replace="~{fragments/sidebar :: navItem('/reports', 'Báo cáo', 'bi-bar-chart', ${activeMenu == 'reports'})}"></li>
+                    <li th:replace="~{fragments/sidebar :: navItem('/alerts', 'Cảnh báo chi tiêu', 'bi-bell', ${activeMenu == 'alerts' or activeMenu == 'notifications'})}"></li>
+                    <li th:replace="~{fragments/sidebar :: navItem('/settings/finance', 'Cài đặt tài chính', 'bi-gear', ${activeMenu == 'settings'})}"></li>
+                </ul>
+                <div class="sidebar-heading">Không gian làm việc</div>
+                <ul class="nav flex-column">
+                    <li th:replace="~{fragments/sidebar :: navItem('/workspaces', 'Quản lý quỹ', 'bi-wallet2', ${activeMenu == 'workspaces'})}"></li>
+                    <li th:replace="~{fragments/sidebar :: navItem('/invitations', 'Lời mời', 'bi-envelope-open', ${activeMenu == 'invitations'})}"></li>
+                </ul>
+                <th:block sec:authorize="hasRole('ADMIN')">
+                <div class="sidebar-heading">Quản trị hệ thống</div>
+                <ul class="nav flex-column">
+                    <li th:replace="~{fragments/sidebar :: navItem('/admin/users', 'Quản lý người dùng', 'bi-people', ${activeMenu == 'admin-users' or activeMenu == 'admin'})}"></li>
+                    <li th:replace="~{fragments/sidebar :: navItem('/admin/categories', 'Quản lý danh mục', 'bi-tags', ${activeMenu == 'admin-categories'})}"></li>
+                </ul>
+                </th:block>
+            </nav>
+            <div class="sidebar-note">Quản lý tài chính mỗi ngày</div>
+        </div>
+    </aside>
+</th:block>
+<li th:fragment="navItem(route, label, icon, selected)" class="nav-item">
+    <a th:href="@{${route}}" class="nav-link" th:classappend="${selected} ? 'active' : ''"
+       th:attr="aria-current=${selected} ? 'page' : null, data-nav-alias=${route == '/alerts'} ? @{/notifications} : null">
+        <i class="bi" th:classappend="${icon}" aria-hidden="true"></i><span th:text="${label}">Điều hướng</span>
+    </a>
+</li>
+</html>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main :: layout(${workspace.name}, 'workspaces', ~{::#main-content}, ~{}, ~{})}">
+    <body>
+        <div id="main-content" class="member-page">
+            <a th:href="@{/workspaces}" class="back-link">
+                Quay lại quỹ của bạn
+            </a>
+            <div class="page-header">
+                <div>
+                    <h1 th:text="${workspace.name}">
+                        Tên quỹ
+                    </h1>
+                    <p class="page-description" th:if="${workspace.description != null}" th:text="${workspace.description}">
+                    </p>
+                    <div class="inline-meta mt-2">
+                        <span class="badge status-neutral" th:text="${workspace.type.name() == 'PERSONAL' ? 'Quỹ cá nhân' : 'Quỹ chung'}">
+                        </span>
+                        <span th:replace="~{fragments/member-ui :: roleLabel(${currentUserRole})}">
+                        </span>
+                        <span th:text="${#lists.size(members)} + ' thành viên'">
+                        </span>
+                    </div>
+                </div>
+                <form th:if="${currentWorkspace != null and currentWorkspace.id != workspace.id}" th:action="@{/workspace/switch}" method="post">
+                    <input type="hidden" name="workspaceId" th:value="${workspace.id}">
+                    <button type="submit" class="btn btn-outline-primary">
+                        Sử dụng quỹ này
+                    </button>
+                </form>
+            </div>
+            <div class="member-grid">
+                <div>
+                    <section class="member-section" aria-labelledby="members-title">
+                        <h2 id="members-title">
+                            Thành viên
+                        </h2>
+                        <div class="table-responsive" tabindex="0" aria-label="Danh sách thành viên">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">
+                                            Thành viên
+                                        </th>
+                                        <th scope="col">
+                                            Email
+                                        </th>
+                                        <th scope="col">
+                                            Vai trò
+                                        </th>
+                                        <th scope="col">
+                                            Trạng thái
+                                        </th>
+                                        <th scope="col">
+                                            Ngày tham gia
+                                        </th>
+                                        <th scope="col" class="text-end" th:if="${currentUserRole.name() == 'OWNER' or currentUserRole.name() == 'MANAGER'}">
+                                            Thao tác
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:if="${#lists.isEmpty(members)}">
+                                        <td th:colspan="${currentUserRole.name() == 'OWNER' or currentUserRole.name() == 'MANAGER' ? 6 : 5}" class="empty-state">
+                                            Chưa có thành viên để hiển thị.
+                                        </td>
+                                    </tr>
+                                    <tr th:each="m : ${members}">
+                                        <td class="identity-cell">
+                                            <strong th:text="${m.fullName}">
+                                            </strong>
+                                            <div class="text-muted small" th:text="'@' + ${m.username}">
+                                            </div>
+                                        </td>
+                                        <td class="contact-cell" th:text="${m.email}">
+                                        </td>
+                                        <td>
+                                            <span th:replace="~{fragments/member-ui :: roleLabel(${m.role})}">
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge status-neutral" th:text="${m.status == null ? 'Chưa xác định' : (m.status.name() == 'ACCEPTED' ? 'Đang tham gia' : (m.status.name() == 'PENDING' ? 'Đang chờ' : 'Đã từ chối'))}">
+                                            </span>
+                                        </td>
+                                        <td class="numeric" th:text="${#temporals.format(m.joinedAt, 'dd/MM/yyyy')}">
+                                        </td>
+                                        <td class="text-end" th:if="${currentUserRole.name() == 'OWNER' or currentUserRole.name() == 'MANAGER'}">
+                                            <div class="table-actions">
+                                                <div class="dropdown" th:if="${m.canBeManaged}">
+                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-config='{"popperConfig":{"strategy":"fixed"}}' aria-expanded="false">
+                                                        Đổi quyền
+                                                    </button>
+                                                    <ul class="dropdown-menu dropdown-menu-end">
+                                                        <li th:if="${currentUserRole.name() == 'OWNER'}">
+                                                            <form th:action="@{/workspaces/{id}/members/{mId}/role(id=${workspace.id}, mId=${m.membershipId})}" method="post">
+                                                                <input type="hidden" name="role" value="MANAGER">
+                                                                <button type="submit" class="dropdown-item" th:classappend="${m.role.name() == 'MANAGER'} ? 'active' : ''">
+                                                                    Quản lý
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                        <li>
+                                                            <form th:action="@{/workspaces/{id}/members/{mId}/role(id=${workspace.id}, mId=${m.membershipId})}" method="post">
+                                                                <input type="hidden" name="role" value="WRITER">
+                                                                <button type="submit" class="dropdown-item" th:classappend="${m.role.name() == 'WRITER'} ? 'active' : ''">
+                                                                    Ghi chép
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                        <li>
+                                                            <form th:action="@{/workspaces/{id}/members/{mId}/role(id=${workspace.id}, mId=${m.membershipId})}" method="post">
+                                                                <input type="hidden" name="role" value="VIEWER">
+                                                                <button type="submit" class="dropdown-item" th:classappend="${m.role.name() == 'VIEWER'} ? 'active' : ''">
+                                                                    Chỉ xem
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                        <li th:if="${currentUserRole.name() == 'OWNER'}">
+                                                            <hr class="dropdown-divider">
+                                                            <form th:action="@{/workspaces/{id}/members/{mId}/role(id=${workspace.id}, mId=${m.membershipId})}" method="post" onsubmit="return confirm('Chuyển quyền sở hữu cho thành viên này? Bạn sẽ không còn là chủ sở hữu quỹ.');">
+                                                                <input type="hidden" name="role" value="OWNER">
+                                                                <button type="submit" class="dropdown-item text-danger">
+                                                                    Chuyển quyền sở hữu
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <form th:if="${m.canBeRemoved}" th:action="@{/workspaces/{id}/members/{mId}/remove(id=${workspace.id}, mId=${m.membershipId})}" method="post" onsubmit="return confirm('Xóa thành viên này khỏi quỹ? Họ sẽ mất quyền truy cập quỹ.');">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                        Xóa
+                                                    </button>
+                                                </form>
+                                                <span th:if="${!m.canBeManaged and !m.canBeRemoved}" class="text-muted small">
+                                                    Không có thao tác
+                                                </span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                    <section class="member-section" th:if="${currentUserRole.name() == 'OWNER' or currentUserRole.name() == 'MANAGER'}">
+                        <h2>
+                            Lời mời đã gửi
+                        </h2>
+                        <p class="text-muted" th:if="${#lists.isEmpty(invitations)}">
+                            Không có lời mời nào đang chờ phản hồi.
+                        </p>
+                        <div class="invitation-list" th:unless="${#lists.isEmpty(invitations)}">
+                            <div class="invitation-row" th:each="inv : ${invitations}">
+                                <div class="workspace-copy">
+                                    <strong th:text="${inv.email}">
+                                    </strong>
+                                    <div class="inline-meta">
+                                        <span class="badge status-pending">
+                                            Đang chờ
+                                        </span>
+                                        <span th:replace="~{fragments/member-ui :: roleLabel(${inv.role})}">
+                                        </span>
+                                        <span>
+                                            Hết hạn:
+                                            <time th:text="${#temporals.format(inv.expiresAt, 'dd/MM/yyyy HH:mm')}">
+                                            </time>
+                                        </span>
+                                    </div>
+                                </div>
+                                <form th:action="@{/workspaces/{id}/invitations/{invId}/cancel(id=${workspace.id}, invId=${inv.id})}" method="post" onsubmit="return confirm('Hủy lời mời này?');">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                                        Hủy lời mời
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                <div>
+                    <section class="member-section" th:if="${currentUserRole.name() == 'OWNER' or currentUserRole.name() == 'MANAGER'}">
+                        <h2>
+                            Mời thành viên
+                        </h2>
+                        <form th:action="@{/workspaces/{id}/invitations(id=${workspace.id})}" method="post" data-submit-feedback>
+                            <div class="mb-3">
+                                <label for="inviteEmail" class="form-label">
+                                    Email người được mời *
+                                </label>
+                                <input id="inviteEmail" type="email" name="email" class="form-control" autocomplete="email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="inviteRole" class="form-label">
+                                    Vai trò
+                                </label>
+                                <select id="inviteRole" name="role" class="form-select" aria-describedby="invite-help">
+                                    <option value="VIEWER" selected>
+                                        Chỉ xem
+                                    </option>
+                                    <option value="WRITER">
+                                        Ghi chép
+                                    </option>
+                                    <option value="MANAGER" th:if="${currentUserRole.name() == 'OWNER'}">
+                                        Quản lý
+                                    </option>
+                                </select>
+                                <div id="invite-help" class="form-text">
+                                    Lời mời có hiệu lực trong 7 ngày.
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary" data-loading-button>
+                                <span class="btn-label">
+                                    Gửi lời mời
+                                </span>
+                                <span class="spinner-border spinner-border-sm loading-spinner" aria-hidden="true">
+                                </span>
+                            </button>
+                        </form>
+                    </section>
+                    <section class="member-section" th:if="${currentUserRole.name() == 'OWNER' or currentUserRole.name() == 'MANAGER'}">
+                        <h2>
+                            Thông tin quỹ
+                        </h2>
+                        <form th:action="@{/workspaces/{id}/edit(id=${workspace.id})}" th:object="${updateForm}" method="post" data-submit-feedback>
+                            <div class="mb-3">
+                                <label for="editName" class="form-label">
+                                    Tên quỹ *
+                                </label>
+                                <input type="text" id="editName" th:field="*{name}" class="form-control" required maxlength="100" aria-describedby="editName-error" th:classappend="${#fields.hasErrors('name')} ? 'is-invalid' : ''">
+                                <div id="editName-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="invalid-feedback d-block">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editDesc" class="form-label">
+                                    Mô tả
+                                </label>
+                                <textarea id="editDesc" th:field="*{description}" class="form-control" rows="3" maxlength="255" aria-describedby="editDesc-error">
+                                </textarea>
+                                <div id="editDesc-error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="invalid-feedback d-block">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-outline-primary" data-loading-button>
+                                <span class="btn-label">
+                                    Lưu thay đổi
+                                </span>
+                                <span class="spinner-border spinner-border-sm loading-spinner" aria-hidden="true">
+                                </span>
+                            </button>
+                        </form>
+                    </section>
+                    <section class="member-section danger-section">
+                        <h2>
+                            Quyền truy cập và dữ liệu
+                        </h2>
+                        <p class="text-muted">
+                            Kiểm tra kỹ trước khi rời quỹ hoặc xóa dữ liệu.
+                        </p>
+                        <form th:if="${workspace.type.name() == 'SHARED'}" th:action="@{/workspaces/{id}/leave(id=${workspace.id})}" method="post" onsubmit="return confirm('Rời quỹ này? Bạn sẽ mất quyền truy cập quỹ.');">
+                            <button type="submit" class="btn btn-outline-danger mb-2">
+                                Rời quỹ
+                            </button>
+                        </form>
+                        <form th:if="${currentUserRole.name() == 'OWNER' and workspace.type.name() == 'SHARED'}" th:action="@{/workspaces/{id}/delete(id=${workspace.id})}" method="post" onsubmit="return confirm('Xóa vĩnh viễn quỹ và dữ liệu liên quan? Thao tác này không thể hoàn tác.');">
+                            <button type="submit" class="btn btn-danger">
+                                Xóa quỹ vĩnh viễn
+                            </button>
+                        </form>
+                        <p th:if="${workspace.type.name() == 'PERSONAL'}" class="form-text mb-0">
+                            Quỹ cá nhân mặc định không thể rời hoặc xóa.
+                        </p>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

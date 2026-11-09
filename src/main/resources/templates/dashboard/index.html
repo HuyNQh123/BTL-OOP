@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="~{fragments/resources :: head('Tổng quan')}"></head>
+    <body>
+    <div class="d-flex">
+        <div th:replace="~{fragments/sidebar :: sidebar('dashboard')}"></div>
+        <main id="app-main" class="flex-grow-1 p-4">
+        <div id="main-content" class="member-page">
+            <div class="page-header">
+                <div>
+                    <h1>
+                        Tổng quan
+                    </h1>
+                    <p class="page-description">
+                        Quỹ và không gian làm việc của bạn.
+                    </p>
+                </div>
+                <a th:href="@{/workspaces}" class="btn btn-outline-secondary">
+                    Quản lý quỹ
+                </a>
+            </div>
+            <section class="member-section" th:if="${currentWorkspace != null}" aria-labelledby="current-workspace-title">
+                <div class="section-heading">
+                    <h2 id="current-workspace-title">
+                        Quỹ đang sử dụng
+                    </h2>
+                    <span class="badge status-active">
+                        Đang sử dụng
+                    </span>
+                </div>
+                <h3 class="workspace-title" th:text="${currentWorkspace.name}">
+                    Tên quỹ
+                </h3>
+                <p class="text-muted" th:if="${currentWorkspace.description != null and !currentWorkspace.description.isEmpty()}" th:text="${currentWorkspace.description}">
+                </p>
+                <div class="page-actions">
+                    <a th:href="@{/workspaces/{id}(id=${currentWorkspace.id})}" class="btn btn-primary">
+                        Thông tin và thành viên
+                    </a>
+                    <a th:href="@{/invitations}" class="btn btn-outline-secondary">
+                        Lời mời của tôi
+                    </a>
+                </div>
+            </section>
+            <section class="member-section empty-state" th:unless="${currentWorkspace != null}">
+                <h2>
+                    Chưa chọn quỹ làm việc
+                </h2>
+                <p>
+                    Chọn một quỹ hiện có hoặc tạo quỹ chung để bắt đầu.
+                </p>
+                <a th:href="@{/workspaces}" class="btn btn-primary">
+                    Xem quỹ của bạn
+                </a>
+            </section>
+            <section class="member-section" aria-labelledby="finance-summary-title">
+                <div class="section-heading"><h2 id="finance-summary-title">Tình hình tài chính tháng này</h2><span class="badge status-active" th:text="${summary.budgetStatus != null ? summary.budgetStatus : 'Chưa lập ngân sách'}">Chưa lập ngân sách</span></div>
+                <div class="row g-3">
+                    <div class="col-sm-6 col-xl-3"><article class="card h-100 border-0 shadow-sm p-3"><div class="small text-muted">Số dư tài khoản</div><strong class="fs-4" th:text="${#numbers.formatDecimal(summary.accountBalance, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</strong></article></div>
+                    <div class="col-sm-6 col-xl-3"><article class="card h-100 border-0 shadow-sm p-3"><div class="small text-muted">Thu nhập tháng này</div><strong class="fs-4 text-success" th:text="${#numbers.formatDecimal(summary.monthlyIncome, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</strong></article></div>
+                    <div class="col-sm-6 col-xl-3"><article class="card h-100 border-0 shadow-sm p-3"><div class="small text-muted">Chi tiêu tháng này</div><strong class="fs-4 text-danger" th:text="${#numbers.formatDecimal(summary.monthlyExpense, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</strong></article></div>
+                    <div class="col-sm-6 col-xl-3"><article class="card h-100 border-0 shadow-sm p-3"><div class="small text-muted">Còn trong phong bì</div><strong class="fs-4" th:text="${#numbers.formatDecimal(summary.envelopeBalance, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</strong></article></div>
+                </div>
+                <div class="d-flex flex-wrap gap-2 mt-3"><a class="btn btn-primary" th:href="@{/transactions/new}">Ghi giao dịch</a><a class="btn btn-outline-primary" th:href="@{/budgets}">Xem ngân sách</a><a class="btn btn-outline-primary" th:href="@{/reports}">Xem báo cáo</a></div>
+                <h3 class="h5 mt-4">Phong bì tháng này</h3>
+                <div class="table-responsive" th:if="${!#lists.isEmpty(summary.envelopes)}"><table class="table align-middle"><thead><tr><th>Phong bì</th><th>Đã chi</th><th>Còn lại</th><th>Tiến độ</th></tr></thead><tbody><tr th:each="envelope : ${summary.envelopes}"><td th:text="${envelope.name}"></td><td th:text="${#numbers.formatDecimal(envelope.spentAmount, 0, 'COMMA', 0, 'POINT')} + ' ₫'"></td><td th:text="${#numbers.formatDecimal(envelope.remainingAmount, 0, 'COMMA', 0, 'POINT')} + ' ₫'"></td><td><div class="progress" style="min-width: 100px"><div class="progress-bar" th:classappend="${envelopePercentages[envelope.id] >= 100 ? 'bg-danger' : 'bg-primary'}" th:style="${'width:' + envelopeWidths[envelope.id] + '%'}" aria-label="Tiến độ chi tiêu"></div></div></td></tr></tbody></table></div>
+                <p class="text-muted" th:if="${#lists.isEmpty(summary.envelopes)}">Chưa có phong bì được phân bổ cho kỳ hiện tại.</p>
+            </section>
+        </div>
+        </main>
+    </div>
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <th:block th:replace="~{fragments/resources :: scripts}"></th:block>
+    </body>
+</html>

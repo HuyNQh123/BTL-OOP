@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main :: layout('Quỹ của bạn', 'workspaces', ~{::#main-content}, ~{}, ~{})}">
+    <body>
+        <div id="main-content" class="member-page">
+            <div class="page-header">
+                <div>
+                    <h1>
+                        Quỹ của bạn
+                    </h1>
+                    <p class="page-description">
+                        Quản lý quỹ cá nhân, quỹ chung và quyền truy cập.
+                    </p>
+                </div>
+                <div class="page-actions">
+                    <a th:href="@{/invitations}" class="btn btn-outline-secondary">
+                        Lời mời nhận được
+                    </a>
+                    <a th:href="@{/workspaces/create}" class="btn btn-primary">
+                        Tạo quỹ chung
+                    </a>
+                </div>
+            </div>
+            <section th:if="${not #lists.isEmpty(pendingInvitations)}" class="member-section" aria-labelledby="pending-title">
+                <h2 id="pending-title">
+                    Lời mời đang chờ
+                </h2>
+                <div th:replace="~{fragments/member-ui :: invitationList(${pendingInvitations})}">
+                </div>
+            </section>
+            <section class="member-section empty-state" th:if="${#lists.isEmpty(workspaces)}">
+                <h2>
+                    Bạn chưa có quỹ nào
+                </h2>
+                <p>
+                    Tạo quỹ chung hoặc kiểm tra lời mời để tham gia một quỹ.
+                </p>
+                <a th:href="@{/workspaces/create}" class="btn btn-primary">
+                    Tạo quỹ chung
+                </a>
+            </section>
+            <div class="workspace-list" th:unless="${#lists.isEmpty(workspaces)}">
+                <section class="workspace-row" th:each="ws : ${workspaces}">
+                    <div class="workspace-copy">
+                        <div class="inline-meta">
+                            <span class="badge status-neutral" th:text="${ws.type.name() == 'PERSONAL' ? 'Quỹ cá nhân' : 'Quỹ chung'}">
+                                Loại quỹ
+                            </span>
+                            <span th:if="${ws.current}" class="badge status-active">
+                                Đang sử dụng
+                            </span>
+                        </div>
+                        <h2 class="workspace-title">
+                            <a th:href="@{/workspaces/{id}(id=${ws.id})}" th:text="${ws.name}">
+                                Tên quỹ
+                            </a>
+                        </h2>
+                        <p class="text-muted" th:if="${ws.description != null and !ws.description.isEmpty()}" th:text="${ws.description}">
+                        </p>
+                        <div class="inline-meta">
+                            <span th:text="${ws.memberCount} + ' thành viên'">
+                            </span>
+                            <span>
+                                Chủ quỹ:
+                                <span th:text="${ws.ownerName}">
+                                </span>
+                            </span>
+                            <span th:replace="~{fragments/member-ui :: roleLabel(${ws.currentUserRole})}">
+                            </span>
+                        </div>
+                    </div>
+                    <div class="page-actions">
+                        <a th:href="@{/workspaces/{id}(id=${ws.id})}" class="btn btn-outline-secondary">
+                            Thông tin và thành viên
+                        </a>
+                        <form th:unless="${ws.current}" th:action="@{/workspace/switch}" method="post">
+                            <input type="hidden" name="workspaceId" th:value="${ws.id}">
+                            <button type="submit" class="btn btn-primary">
+                                Sử dụng quỹ này
+                            </button>
+                        </form>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- Giao diện Báo cáo thống kê tài chính (Phụ trách bởi: Thành viên 5) -->
+<head th:replace="~{fragments/resources :: head('Báo cáo thống kê')}">
+</head>
+<body>
+<div class="d-flex">
+    <div th:replace="~{fragments/sidebar :: sidebar('reports')}"></div>
+    <main class="flex-grow-1 p-4">
+        <h2>Báo Cáo & Phân Tích Tài Chính</h2>
+        <p class="text-muted">Biểu đồ cơ cấu chi tiêu theo danh mục và so sánh thu chi theo thời gian.</p>
+        <form class="row g-2 align-items-end mt-3" method="get" th:action="@{/reports}">
+            <div class="col-auto"><label class="form-label" for="month">Tháng</label><input class="form-control" id="month" name="month" type="number" min="1" max="12" th:value="${month}" required></div>
+            <div class="col-auto"><label class="form-label" for="year">Năm</label><input class="form-control" id="year" name="year" type="number" min="2000" max="2100" th:value="${year}" required></div>
+            <div class="col-auto"><button class="btn btn-primary" type="submit">Xem báo cáo</button></div>
+        </form>
+        <div class="row g-3 mt-1">
+            <div class="col-md-4"><div class="card shadow-sm border-0 p-3 h-100"><div class="small text-muted">Tổng thu</div><strong class="fs-4 text-success" th:text="${#numbers.formatDecimal(summary.totalIncome, 0, 'COMMA', 0, 'POINT')} + ' ₫'"></strong></div></div>
+            <div class="col-md-4"><div class="card shadow-sm border-0 p-3 h-100"><div class="small text-muted">Tổng chi</div><strong class="fs-4 text-danger" th:text="${#numbers.formatDecimal(summary.totalExpense, 0, 'COMMA', 0, 'POINT')} + ' ₫'"></strong></div></div>
+            <div class="col-md-4"><div class="card shadow-sm border-0 p-3 h-100"><div class="small text-muted">Chênh lệch thu − chi</div><strong class="fs-4" th:text="${#numbers.formatDecimal(summary.netSavings, 0, 'COMMA', 0, 'POINT')} + ' ₫'"></strong></div></div>
+        </div>
+        <div class="card shadow-sm border-0 p-4 mt-3">
+            <h3 class="h5">Huy hiệu kỷ luật tháng này</h3><p class="mb-0"><span class="badge text-bg-success" th:text="${disciplineBadge}"></span></p>
+        </div>
+        <div class="card shadow-sm border-0 p-4 mt-3">
+            <h3 class="h5">Bản đồ bù ngân sách</h3>
+            <p class="text-muted small">Phong bì nguồn được rút tiền nhiều nhất để bù cho các khoản chi vượt.</p>
+            <div th:if="${#maps.isEmpty(rescueMap)}" class="text-muted">Tháng này chưa phát sinh điều chuyển bù.</div>
+            <div th:each="item : ${rescueMap}" class="d-flex justify-content-between border-bottom py-2"><span th:text="${item.key}"></span><strong th:text="${#numbers.formatDecimal(item.value, 0, 'COMMA', 0, 'POINT')} + ' ₫ đã bù'"></strong></div>
+        </div>
+        <div class="card shadow-sm border-0 p-4 mt-3">
+            <h3 class="h5">Chi tiêu theo danh mục</h3>
+            <div th:if="${#maps.isEmpty(summary.categoryBreakdowns)}" class="text-muted">Chưa có khoản chi trong kỳ này.</div>
+            <div th:each="item : ${summary.categoryBreakdowns}" class="mb-3">
+                <div class="d-flex justify-content-between"><span th:text="${item.key}"></span><strong th:text="${#numbers.formatDecimal(item.value, 0, 'COMMA', 0, 'POINT')} + ' ₫'"></strong></div>
+                <div class="progress"><div class="progress-bar" role="progressbar" th:style="${'width:' + categoryPercentages[item.key] + '%'}" aria-label="Tỷ trọng danh mục"></div></div>
+            </div>
+        </div>
+    </main>
+</div>
+<div th:replace="~{fragments/footer :: footer}"></div>
+<th:block th:replace="~{fragments/resources :: scripts}"></th:block>
+</body>
+</html>
+

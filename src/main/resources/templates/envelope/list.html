@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- Giao diện Danh sách phong bì ngân sách (Phụ trách bởi: Thành viên 2) -->
+<head th:replace="~{fragments/resources :: head('Danh sách phong bì')}">
+</head>
+<body>
+<div class="d-flex">
+    <div th:replace="~{fragments/sidebar :: sidebar('envelopes')}"></div>
+    <main class="flex-grow-1 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div><h2 th:text="${selectedBudget != null ? 'Phong bì · ' + selectedBudget.name : 'Phong Bì Ngân Sách'}">Phong Bì Ngân Sách</h2><div class="small text-muted" th:if="${selectedBudget != null}" th:text="${selectedBudget.month + '/' + selectedBudget.year + ' · ' + selectedBudget.status}"></div></div>
+            <a th:href="${selectedBudgetId != null ? '/envelopes/new?budgetId=' + selectedBudgetId : '/envelopes/new'}" class="btn btn-primary" th:if="${selectedBudget == null or selectedBudget.status.name() == 'DRAFT'}">
+                <i class="bi bi-plus-lg me-1"></i> Tạo Phong Bì
+            </a>
+        </div>
+        <p class="text-muted">Quản lý hạn mức chi tiêu cho từng danh mục theo phương pháp phong bì.</p>
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+        <section class="card border-0 shadow-sm p-3 mt-3" th:if="${selectedBudget != null}" aria-labelledby="allocationSummaryTitle">
+            <h3 id="allocationSummaryTitle" class="h5">Phân bổ thu nhập kỳ này</h3>
+            <div class="d-flex flex-wrap gap-4">
+                <span>Khả dụng: <strong th:text="${#numbers.formatDecimal(selectedBudget.totalIncome, 0, 'COMMA', 0, 'POINT')} + ' ₫'"></strong></span>
+                <span>Đã phân bổ: <strong th:text="${#numbers.formatDecimal(selectedBudget.totalAllocated, 0, 'COMMA', 0, 'POINT')} + ' ₫'"></strong></span>
+                <span>Còn cần phân bổ: <strong th:text="${#numbers.formatDecimal(selectedBudget.totalIncome.subtract(selectedBudget.totalAllocated), 0, 'COMMA', 0, 'POINT')} + ' ₫'"></strong></span>
+            </div>
+            <p class="small text-muted mb-0 mt-2" th:if="${selectedBudget.status.name() == 'DRAFT'}">Tạo phong bì theo các khoản chi, sau đó quay lại Ngân sách để xác nhận khi đã phân bổ đủ.</p>
+        </section>
+        <div class="card shadow-sm border-0 p-4 mt-3" th:if="${#lists.isEmpty(envelopes)}">
+            <p class="text-muted mb-0">Chưa có phong bì ngân sách nào trong chu kỳ này.</p>
+        </div>
+        <div class="row g-3 mt-1" th:unless="${#lists.isEmpty(envelopes)}">
+            <div class="col-md-6 col-xl-4" th:each="envelope : ${envelopes}">
+                <article class="card h-100 shadow-sm border-0 p-3">
+                    <div class="d-flex justify-content-between"><div><div class="small text-muted" th:text="${envelope.categoryName}">Danh mục</div><h5 th:text="${envelope.name}">Phong bì</h5></div><i class="bi bi-envelope fs-4 text-primary"></i></div>
+                    <div class="progress my-2" role="progressbar" th:attr="aria-valuenow=${envelope.percentSpent},aria-valuemin=0,aria-valuemax=100"><div class="progress-bar" th:classappend="${envelope.percentSpent >= 100 ? 'bg-danger' : (envelope.percentSpent >= 80 ? 'bg-warning' : 'bg-primary')}" th:style="'width:' + ${T(java.lang.Math).min(100, envelope.percentSpent.intValue())} + '%'"></div></div>
+                    <div class="d-flex justify-content-between small"><span th:text="${#numbers.formatDecimal(envelope.spentAmount, 0, 'COMMA', 0, 'POINT')} + ' ₫ đã chi'"></span><span th:text="${#numbers.formatDecimal(envelope.remainingAmount, 0, 'COMMA', 0, 'POINT')} + ' ₫ còn lại'"></span></div>
+                    <div class="small text-muted mt-2" th:text="${envelope.budgetName} + ' · hạn mức ' + ${#numbers.formatDecimal(envelope.allocatedAmount, 0, 'COMMA', 0, 'POINT')} + ' ₫'"></div>
+                    <div class="alert alert-light py-2 px-3 mt-2 mb-0 small" th:if="${envelope.budgetStatus.name() == 'CONFIRMED'}"><strong>Nhịp chi gợi ý:</strong> tối đa <span th:text="${#numbers.formatDecimal(envelope.dailyAllowance, 0, 'COMMA', 0, 'POINT')} + ' ₫/ngày'"></span> trong <span th:text="${envelope.daysRemaining}"></span> ngày còn lại.</div>
+                    <form th:if="${envelope.budgetStatus.name() == 'CONFIRMED'}" th:action="@{/envelopes/{id}/fixed(id=${envelope.id})}" method="post" class="mt-2">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><input type="hidden" name="budgetId" th:value="${selectedBudgetId}">
+                        <input type="hidden" name="fixed" th:value="${!envelope.fixedEnvelope}">
+                        <button class="btn btn-sm" th:classappend="${envelope.fixedEnvelope ? 'btn-warning' : 'btn-outline-secondary'}" type="submit" th:text="${envelope.fixedEnvelope ? '🔒 Đang khóa · Mở khóa' : 'Khóa phong bì thiết yếu'}"></button>
+                    </form>
+                    <div th:if="${envelope.budgetStatus.name() == 'DRAFT'}" class="d-flex flex-wrap gap-2 mt-3">
+                        <a th:href="@{/envelopes/{id}/edit(id=${envelope.id})}" class="btn btn-sm btn-outline-primary">Sửa hạn mức</a>
+                        <form th:action="@{/envelopes/{id}/delete(id=${envelope.id})}" method="post" class="mb-0" onsubmit="return confirm('Xóa phong bì nháp này?')">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Xóa phong bì</button>
+                        </form>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </main>
+</div>
+<div th:replace="~{fragments/footer :: footer}"></div>
+<th:block th:replace="~{fragments/resources :: scripts}"></th:block>
+</body>
+</html>
+

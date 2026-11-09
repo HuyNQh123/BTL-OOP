@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main :: layout('Danh mục hệ thống', 'admin-categories', ~{::#main-content}, ~{}, ~{})}">
+    <body>
+        <div id="main-content" class="member-page">
+            <div class="page-header">
+                <div>
+                    <h1>
+                        Danh mục hệ thống
+                    </h1>
+                    <p class="page-description">
+                        Quản lý danh mục thu nhập và chi tiêu dùng chung.
+                    </p>
+                </div>
+                <a th:href="@{/admin/categories/create}" class="btn btn-primary">
+                    Thêm danh mục
+                </a>
+            </div>
+            <nav class="member-tabs" aria-label="Quản trị hệ thống">
+                <a th:href="@{/admin/users}">
+                    Người dùng
+                </a>
+                <a th:href="@{/admin/categories}" aria-current="page">
+                    Danh mục hệ thống
+                </a>
+            </nav>
+            <section class="member-section">
+                <form th:action="@{/admin/categories}" method="get" class="filter-grid">
+                    <div>
+                        <label for="categoryKeyword" class="form-label">
+                            Tên danh mục
+                        </label>
+                        <input type="search" id="categoryKeyword" name="keyword" class="form-control" placeholder="Tìm danh mục" th:value="${keyword}">
+                    </div>
+                    <div>
+                        <label for="categoryType" class="form-label">
+                            Loại danh mục
+                        </label>
+                        <select id="categoryType" name="type" class="form-select">
+                            <option value="" th:selected="${selectedType == null}">
+                                Tất cả loại
+                            </option>
+                            <option th:each="t : ${categoryTypes}" th:value="${t}" th:selected="${selectedType != null and selectedType == t}" th:text="${t.name() == 'INCOME' ? 'Thu nhập' : 'Chi tiêu'}">
+                            </option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="categoryStatus" class="form-label">
+                            Trạng thái
+                        </label>
+                        <select id="categoryStatus" name="isActive" class="form-select">
+                            <option value="" th:selected="${selectedStatus == null}">
+                                Tất cả trạng thái
+                            </option>
+                            <option value="true" th:selected="${selectedStatus != null and selectedStatus == true}">
+                                Đang sử dụng
+                            </option>
+                            <option value="false" th:selected="${selectedStatus != null and selectedStatus == false}">
+                                Đã ẩn
+                            </option>
+                        </select>
+                    </div>
+                    <div class="page-actions">
+                        <button type="submit" class="btn btn-primary">
+                            Lọc
+                        </button>
+                        <a th:href="@{/admin/categories}" class="btn btn-outline-secondary">
+                            Xóa bộ lọc
+                        </a>
+                    </div>
+                </form>
+            </section>
+            <section class="member-section table-section">
+                <div class="table-responsive" tabindex="0" aria-label="Danh sách danh mục">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th scope="col">
+                                    Mã
+                                </th>
+                                <th scope="col">
+                                    Danh mục
+                                </th>
+                                <th scope="col">
+                                    Loại
+                                </th>
+                                <th scope="col">
+                                    Phạm vi
+                                </th>
+                                <th scope="col">
+                                    Trạng thái
+                                </th>
+                                <th scope="col" class="text-end">
+                                    Thao tác
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${categories == null or categories.isEmpty()}">
+                                <td colspan="6" class="empty-state">
+                                    Không tìm thấy danh mục phù hợp. Hãy thay đổi bộ lọc hoặc thêm danh mục mới.
+                                </td>
+                            </tr>
+                            <tr th:each="cat : ${categories}">
+                                <td class="numeric" th:text="${cat.id}">
+                                </td>
+                                <td class="identity-cell">
+                                    <div class="category-name">
+                                        <i class="bi" aria-hidden="true" th:classappend="${cat.icon != null and !cat.icon.isEmpty() ? cat.icon : 'bi-tag'}" th:style="'color: ' + (${cat.color != null and !cat.color.isEmpty()} ? ${cat.color} : 'var(--color-primary)')">
+                                        </i>
+                                        <strong th:text="${cat.name}">
+                                        </strong>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge status-neutral" th:text="${cat.type.name() == 'INCOME' ? 'Thu nhập' : 'Chi tiêu'}">
+                                    </span>
+                                </td>
+                                <td>
+                                    Hệ thống
+                                </td>
+                                <td>
+                                    <span class="badge" th:classappend="${cat.isActive != false} ? 'status-active' : 'status-inactive'" th:text="${cat.isActive != false ? 'Đang sử dụng' : 'Đã ẩn'}">
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="table-actions">
+                                        <a th:href="@{/admin/categories/{id}/edit(id=${cat.id})}" class="btn btn-sm btn-outline-secondary">
+                                            Sửa
+                                        </a>
+                                        <form th:if="${cat.isActive != false}" th:action="@{/admin/categories/{id}/deactivate(id=${cat.id})}" method="post" onsubmit="return confirm('Ẩn danh mục này khỏi các giao dịch mới? Lịch sử giao dịch vẫn được giữ nguyên.');">
+                                            <button type="submit" class="btn btn-sm btn-outline-secondary">
+                                                Ẩn
+                                            </button>
+                                        </form>
+                                        <form th:if="${cat.isActive == false}" th:action="@{/admin/categories/{id}/activate(id=${cat.id})}" method="post" onsubmit="return confirm('Sử dụng lại danh mục này?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-primary">
+                                                Sử dụng lại
+                                            </button>
+                                        </form>
+                                        <form th:action="@{/admin/categories/{id}/delete(id=${cat.id})}" method="post" onsubmit="return confirm('Xóa vĩnh viễn danh mục? Chỉ có thể xóa khi chưa có giao dịch liên kết.');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                Xóa
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </body>
+</html>

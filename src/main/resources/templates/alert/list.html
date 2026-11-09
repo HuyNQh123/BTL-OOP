@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/resources :: head('Cảnh báo và thông báo')}"></head>
+<body>
+<div class="d-flex">
+    <div th:replace="~{fragments/sidebar :: sidebar('alerts')}"></div>
+    <main class="flex-grow-1 p-4">
+        <h2>Cảnh báo và thông báo</h2>
+        <p class="text-muted">Thông báo ngân sách và cập nhật gửi tới tài khoản của bạn.</p>
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-danger" role="alert" th:text="${errorMessage}"></div>
+        <div th:if="${param.setupEmail}" class="alert alert-info" role="status">
+            Xác minh Gmail để nhận cảnh báo ngân sách và các thông báo mới qua email.
+        </div>
+
+        <section id="notification-email" class="card border-0 shadow-sm p-4 mb-4" style="max-width: 860px; scroll-margin-top: 100px"
+                 aria-labelledby="notification-email-title">
+            <h3 id="notification-email-title" class="h5">Email nhận thông báo</h3>
+            <p class="text-muted">Xác minh Gmail để nhận cảnh báo ngân sách và thông báo mới từ SmartEnvelope.</p>
+
+            <div th:if="${emailVerified}" class="alert alert-success mb-0">
+                Gmail đã xác minh: <strong th:text="${notificationEmail}">name@gmail.com</strong>
+            </div>
+            <form th:unless="${emailVerified}" th:action="@{/account/email/send-code}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <div class="mb-3">
+                    <label for="notificationEmail" class="form-label">Địa chỉ Gmail</label>
+                    <input id="notificationEmail" name="notificationEmail" type="email" class="form-control"
+                           th:value="${notificationEmail}" placeholder="ten@gmail.com" autocomplete="email"
+                           pattern=".+@gmail\.com" required maxlength="100" style="max-width: 520px">
+                    <div class="form-text">SmartEnvelope sẽ gửi mã xác minh tới địa chỉ này.</div>
+                </div>
+                <button type="submit" class="btn btn-primary">Gửi mã xác minh</button>
+            </form>
+
+            <form th:if="${verificationPending and !emailVerified}" th:action="@{/account/email/verify}"
+                  method="post" class="mt-4">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <div class="mb-3">
+                    <label for="code" class="form-label">Mã xác minh 6 số</label>
+                    <input id="code" name="code" type="text" class="form-control" inputmode="numeric"
+                           pattern="[0-9]{6}" minlength="6" maxlength="6" autocomplete="one-time-code"
+                           required style="max-width: 240px">
+                    <div class="form-text">Mã có hiệu lực trong 10 phút.</div>
+                </div>
+                <button type="submit" class="btn btn-primary">Xác minh Gmail</button>
+            </form>
+        </section>
+
+        <div th:if="${#lists.isEmpty(notifications)}" class="card border-0 shadow-sm p-4">
+            <p class="text-muted mb-0">Bạn chưa có thông báo nào.</p>
+        </div>
+        <div class="list-group" th:unless="${#lists.isEmpty(notifications)}">
+            <article class="list-group-item p-3" th:each="notification : ${notifications}">
+                <div class="d-flex justify-content-between gap-3">
+                    <div>
+                        <span class="badge me-2"
+                              th:classappend="${notification.type.name() == 'OVERSPENT'} ? 'text-bg-danger' : (${notification.type.name() == 'NEAR_LIMIT'} ? 'text-bg-warning' : 'text-bg-secondary')"
+                              th:text="${notification.type}"></span>
+                        <strong th:text="${notification.title}"></strong>
+                        <p class="mb-1 mt-2" th:text="${notification.message}"></p>
+                        <small class="text-muted" th:text="${#temporals.format(notification.createdAt, 'dd/MM/yyyy HH:mm')}"></small>
+                        <div><a th:if="${notification.actionUrl != null}" th:href="@{${notification.actionUrl}}" class="btn btn-sm btn-link px-0">Mở nội dung liên quan</a></div>
+                    </div>
+                    <form th:if="${notification.status.name() != 'READ'}"
+                          th:action="@{/alerts/{id}/read(id=${notification.id})}" method="post">
+                        <button type="submit" class="btn btn-sm btn-outline-secondary">Đã đọc</button>
+                    </form>
+                    <span th:if="${notification.status.name() == 'READ'}" class="small text-muted">Đã đọc</span>
+                </div>
+            </article>
+        </div>
+    </main>
+</div>
+<div th:replace="~{fragments/footer :: footer}"></div>
+<th:block th:replace="~{fragments/resources :: scripts}"></th:block>
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main :: layout('Quản lý người dùng', 'admin-users', ~{::#main-content}, ~{}, ~{})}">
+    <body>
+        <div id="main-content" class="member-page">
+            <div class="page-header">
+                <div>
+                    <h1>
+                        Quản lý người dùng
+                    </h1>
+                    <p class="page-description">
+                        Tìm tài khoản và quản lý quyền truy cập.
+                    </p>
+                </div>
+                <span class="badge status-neutral">
+                    <span th:text="${usersPage != null ? usersPage.totalElements : 0}">
+                        0
+                    </span>
+                    tài khoản
+                </span>
+            </div>
+            <nav class="member-tabs" aria-label="Quản trị hệ thống">
+                <a th:href="@{/admin/users}" aria-current="page">
+                    Người dùng
+                </a>
+                <a th:href="@{/admin/categories}">
+                    Danh mục hệ thống
+                </a>
+            </nav>
+            <section class="member-section">
+                <form th:action="@{/admin/users}" method="get" class="filter-grid">
+                    <div>
+                        <label for="userKeyword" class="form-label">
+                            Tên, email hoặc tên đăng nhập
+                        </label>
+                        <input id="userKeyword" type="search" name="keyword" class="form-control" th:value="${keyword}" placeholder="Tìm người dùng">
+                    </div>
+                    <div>
+                        <label for="userRole" class="form-label">
+                            Vai trò
+                        </label>
+                        <select id="userRole" name="role" class="form-select">
+                            <option value="" th:selected="${selectedRole == null}">
+                                Tất cả vai trò
+                            </option>
+                            <option th:each="r : ${roles}" th:value="${r}" th:selected="${selectedRole != null and selectedRole == r}" th:text="${r.name() == 'ADMIN' ? 'Quản trị viên' : 'Người dùng'}">
+                            </option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="userStatus" class="form-label">
+                            Trạng thái
+                        </label>
+                        <select id="userStatus" name="status" class="form-select">
+                            <option value="" th:selected="${selectedStatus == null}">
+                                Tất cả trạng thái
+                            </option>
+                            <option th:each="st : ${statuses}" th:value="${st}" th:selected="${selectedStatus != null and selectedStatus == st}" th:text="${st.name() == 'ACTIVE' ? 'Hoạt động' : (st.name() == 'LOCKED' ? 'Đã khóa' : 'Chưa kích hoạt')}">
+                            </option>
+                        </select>
+                    </div>
+                    <div class="page-actions">
+                        <button type="submit" class="btn btn-primary">
+                            Lọc
+                        </button>
+                        <a th:href="@{/admin/users}" class="btn btn-outline-secondary">
+                            Xóa bộ lọc
+                        </a>
+                    </div>
+                </form>
+            </section>
+            <section class="member-section table-section">
+                <div class="table-responsive" tabindex="0" aria-label="Danh sách người dùng">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th scope="col">
+                                    Mã
+                                </th>
+                                <th scope="col">
+                                    Người dùng
+                                </th>
+                                <th scope="col">
+                                    Liên hệ
+                                </th>
+                                <th scope="col">
+                                    Vai trò
+                                </th>
+                                <th scope="col">
+                                    Trạng thái
+                                </th>
+                                <th scope="col">
+                                    Ngày đăng ký
+                                </th>
+                                <th scope="col" class="text-end">
+                                    Thao tác
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${usersPage == null or usersPage.content.isEmpty()}">
+                                <td colspan="7" class="empty-state">
+                                    Không tìm thấy người dùng phù hợp. Hãy thử thay đổi từ khóa hoặc bộ lọc.
+                                </td>
+                            </tr>
+                            <tr th:each="u : ${usersPage.content}">
+                                <td class="numeric" th:text="${u.id}">
+                                </td>
+                                <td class="identity-cell">
+                                    <a th:href="@{/admin/users/{id}(id=${u.id})}" th:text="${u.fullName}">
+                                    </a>
+                                    <div class="small text-muted" th:text="'@' + ${u.username}">
+                                    </div>
+                                </td>
+                                <td class="contact-cell">
+                                    <span th:text="${u.email}">
+                                    </span>
+                                    <div class="small text-muted" th:if="${u.phone != null and !u.phone.isEmpty()}" th:text="${u.phone}">
+                                    </div>
+                                </td>
+                                <td>
+                                    <span th:replace="~{fragments/member-ui :: roleLabel(${u.role})}">
+                                    </span>
+                                </td>
+                                <td>
+                                    <span th:replace="~{fragments/member-ui :: userStatus(${u.status})}">
+                                    </span>
+                                </td>
+                                <td class="numeric" th:text="${u.createdAt != null ? #temporals.format(u.createdAt, 'dd/MM/yyyy') : 'Chưa cập nhật'}">
+                                </td>
+                                <td>
+                                    <div class="table-actions">
+                                        <a th:href="@{/admin/users/{id}(id=${u.id})}" class="btn btn-sm btn-outline-secondary">
+                                            Chi tiết
+                                        </a>
+                                        <th:block th:if="${currentAdminId != null and currentAdminId != u.id}">
+                                            <form th:if="${u.status != T(com.smartenvelope.enums.UserStatus).LOCKED}" th:action="@{/admin/users/{id}/lock(id=${u.id})}" method="post" onsubmit="return confirm('Khóa tài khoản này? Người dùng sẽ không thể đăng nhập.');">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    Khóa
+                                                </button>
+                                            </form>
+                                            <form th:if="${u.status == T(com.smartenvelope.enums.UserStatus).LOCKED}" th:action="@{/admin/users/{id}/unlock(id=${u.id})}" method="post" onsubmit="return confirm('Mở khóa tài khoản này?');">
+                                                <button type="submit" class="btn btn-sm btn-outline-primary">
+                                                    Mở khóa
+                                                </button>
+                                            </form>
+                                        </th:block>
+                                        <span th:if="${currentAdminId != null and currentAdminId == u.id}" class="badge status-neutral">
+                                            Bạn
+                                        </span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="table-footer" th:if="${usersPage != null and usersPage.totalPages > 1}">
+                    <span class="text-muted small">
+                        Trang
+                        <span th:text="${usersPage.number + 1}">
+                        </span>
+                        /
+                        <span th:text="${usersPage.totalPages}">
+                        </span>
+                    </span>
+                    <nav aria-label="Phân trang người dùng">
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item" th:classappend="${usersPage.first} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/admin/users(page=${usersPage.number - 1}, keyword=${keyword}, role=${selectedRole}, status=${selectedStatus})}" th:attr="aria-disabled=${usersPage.first}, tabindex=${usersPage.first} ? -1 : null">
+                                    Trước
+                                </a>
+                            </li>
+                            <li class="page-item" th:each="i : ${#numbers.sequence(usersPage.number > 2 ? usersPage.number - 2 : 0, usersPage.number + 2 < usersPage.totalPages ? usersPage.number + 2 : usersPage.totalPages - 1)}" th:classappend="${i == usersPage.number} ? 'active' : ''">
+                                <a class="page-link" th:href="@{/admin/users(page=${i}, keyword=${keyword}, role=${selectedRole}, status=${selectedStatus})}" th:attr="aria-current=${i == usersPage.number} ? 'page' : null" th:text="${i + 1}">
+                                </a>
+                            </li>
+                            <li class="page-item" th:classappend="${usersPage.last} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/admin/users(page=${usersPage.number + 1}, keyword=${keyword}, role=${selectedRole}, status=${selectedStatus})}" th:attr="aria-disabled=${usersPage.last}, tabindex=${usersPage.last} ? -1 : null">
+                                    Sau
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </section>
+        </div>
+    </body>
+</html>

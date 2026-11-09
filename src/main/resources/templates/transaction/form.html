@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/resources :: head('Giao dịch mới')}"></head>
+<body>
+<div class="d-flex">
+    <div th:replace="~{fragments/sidebar :: sidebar('transactions')}"></div>
+    <main class="flex-grow-1 p-4">
+        <h2>Ghi Nhận Giao Dịch</h2>
+        <div class="transaction-entry-grid mt-3">
+        <div class="card shadow-sm border-0 p-4 transaction-form-card">
+            <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+            <div class="alert alert-warning" th:if="${#lists.isEmpty(accounts)}">Hãy tạo tài khoản trước khi ghi giao dịch.</div>
+            <div id="budgetConfirmationHint" class="alert alert-info d-none">Kỳ ngân sách của ngày giao dịch chưa được xác nhận. Bạn có thể ghi nhận thu nhập; để ghi khoản chi, hãy <a th:href="@{/budgets}">phân bổ và xác nhận ngân sách</a> trước.</div>
+            <form th:action="@{/transactions}" th:object="${transactionRequest}" method="post" th:if="${!#lists.isEmpty(accounts)}">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <section class="border rounded p-3 mb-4 bg-light" aria-label="Nhập giao dịch bằng AI">
+                    <h5 class="mb-2">Nhập nhanh với AI</h5>
+                    <label class="form-label" for="aiPrompt">Mô tả giao dịch bằng một câu</label>
+                    <div class="input-group mb-2"><input id="aiPrompt" class="form-control" maxlength="1000" placeholder="Ví dụ: Sáng nay ăn phở 65k"><button id="aiParseButton" type="button" class="btn btn-outline-primary">Phân tích</button></div>
+                    <label class="form-label" for="receiptImage">Hoặc tải ảnh hóa đơn (JPG, PNG, WEBP)</label>
+                    <div class="input-group"><input id="receiptImage" type="file" class="form-control" accept="image/jpeg,image/png,image/webp"><button id="receiptParseButton" type="button" class="btn btn-outline-primary">Đọc hóa đơn</button></div>
+                    <div id="aiParseMessage" class="form-text mt-2" role="status" aria-live="polite">AI chỉ điền bản nháp; kiểm tra thông tin rồi mới lưu giao dịch. Ảnh hóa đơn được gửi tới nhà cung cấp AI đã cấu hình để phân tích.</div>
+                </section>
+                <div class="mb-3"><label class="form-label" for="type">Loại giao dịch</label><select id="type" class="form-select" th:field="*{type}" required><option id="expenseType" value="EXPENSE" th:disabled="${!hasConfirmedBudget}">Chi tiêu</option><option value="INCOME">Thu nhập</option></select><div class="text-danger small" th:errors="*{type}"></div></div>
+                <div class="mb-3"><label class="form-label" for="amount">Số tiền (₫)</label><input id="amount" type="number" min="1" step="1" th:field="*{amount}" class="form-control" placeholder="0" required><div class="text-danger small" th:errors="*{amount}"></div></div>
+                <div id="effortPreviewHint" class="form-text mb-3">Chọn danh mục chi và nhập số tiền để xem số giờ làm tương đương.</div>
+                <div id="effortWarning" class="alert alert-warning d-none" role="status" aria-live="polite" th:attr="data-hourly-wage=${hourlyWage}"></div>
+                <div id="hourlyWageHint" class="alert alert-info d-none mb-3">Bạn chưa cài thu nhập theo giờ nên chưa thể quy đổi khoản chi thành giờ làm. <a th:href="@{/settings/finance}">Cài đặt thu nhập theo giờ</a>.</div>
+                <div class="mb-3"><label class="form-label" for="accountId">Tài khoản nguồn tiền</label><select id="accountId" th:field="*{accountId}" class="form-select" required><option value="">-- Chọn tài khoản --</option><option th:each="account : ${accounts}" th:value="${account.id}" th:text="${account.name}"></option></select><div class="text-danger small" th:errors="*{accountId}"></div></div>
+                <div class="mb-3"><label class="form-label" for="categoryId">Danh mục</label><select id="categoryId" th:field="*{categoryId}" class="form-select" required><option value="">-- Chọn danh mục --</option><option th:each="category : ${categories}" th:value="${category.id}" th:attr="data-type=${category.type},data-other=${category.isSystem and category.name == 'Mục khác'}" th:text="${category.name}"></option></select><div class="text-danger small" th:errors="*{categoryId}"></div></div>
+                <div class="mb-3" id="expenseFields">
+                    <input type="hidden" id="envelopeId" th:field="*{envelopeId}">
+                    <select id="envelopeOptions" class="d-none" aria-hidden="true" tabindex="-1"><option value="">-- Chưa có phong bì --</option><option th:each="envelope : ${envelopes}" th:value="${envelope.id}" th:attr="data-category=${envelope.category.id},data-budget=${envelope.budgetPeriod.id},data-start=${envelope.budgetPeriod.startDate},data-end=${envelope.budgetPeriod.endDate},data-remaining=${envelope.remainingAmount}" th:text="${envelope.name + ' (' + envelope.remainingAmount + ' ₫ còn lại)'}"></option></select>
+                    <div id="envelopeSummary" class="form-text mb-2">Chọn danh mục; phong bì tương ứng sẽ được chọn tự động.</div>
+                    <div class="form-text">Nếu phong bì thiếu, chọn nguồn bù bên dưới. Tài khoản vẫn cần đủ tiền thực tế.</div>
+                    <div id="sourceEnvelopeFields">
+                        <label id="sourceEnvelopeLabel" class="form-label mt-2" for="sourceEnvelopeId">Phong bì nguồn bù (nếu cần)</label>
+                        <select id="sourceEnvelopeId" th:field="*{sourceEnvelopeId}" class="form-select"><option value="">-- Chọn phong bì --</option><option th:each="envelope : ${envelopes}" th:value="${envelope.id}" th:attr="data-budget=${envelope.budgetPeriod.id},data-start=${envelope.budgetPeriod.startDate},data-end=${envelope.budgetPeriod.endDate},data-remaining=${envelope.remainingAmount}" th:disabled="${envelope.fixedEnvelope}" th:text="${envelope.name + (envelope.fixedEnvelope ? ' 🔒 (đã khóa)' : ' (' + envelope.remainingAmount + ' ₫ còn lại)')}"></option></select>
+                        <div id="otherExpenseHint" class="form-text text-warning d-none">Mục khác bắt buộc phải chọn phong bì còn đủ số dư để bù toàn bộ khoản chi.</div>
+                    </div>
+                </div>
+                <div class="mb-3"><label class="form-label" for="transactionDate">Ngày giao dịch</label><input id="transactionDate" type="date" th:field="*{transactionDate}" class="form-control" required><div class="text-danger small" th:errors="*{transactionDate}"></div></div>
+                <div class="mb-3"><label class="form-label" for="note">Ghi chú</label><textarea id="note" th:field="*{note}" class="form-control" rows="2" maxlength="500" placeholder="Nội dung giao dịch..."></textarea><div class="text-danger small" th:errors="*{note}"></div></div>
+                <button type="submit" class="btn btn-primary">Lưu Giao Dịch</button><a th:href="@{/transactions}" class="btn btn-secondary ms-2">Hủy</a>
+            </form>
+        </div>
+        <aside class="card shadow-sm border-0 p-3 envelope-limits-panel" id="envelopeLimitsPanel" aria-labelledby="envelopeLimitsTitle">
+            <h5 id="envelopeLimitsTitle" class="mb-1">Hạn mức các phong bì</h5>
+            <p class="small text-muted mb-3" id="envelopeLimitsHelp">Đối chiếu số đã chi và số dư trước khi lưu. Phong bì hết tiền vẫn có thể chọn để bù.</p>
+            <div id="envelopeLimitsEmpty" class="small text-muted d-none">Ngày này chưa có phong bì thuộc kỳ ngân sách đã xác nhận.</div>
+            <div id="envelopeLimitIncomeHint" class="small text-muted d-none">Bảng hạn mức chỉ áp dụng cho giao dịch chi tiêu.</div>
+            <div id="envelopeLimitList" class="envelope-limit-list">
+                <article class="envelope-limit-item" th:each="envelope : ${envelopes}"
+                         th:attr="data-envelope-id=${envelope.id},data-category=${envelope.category.id},data-start=${envelope.budgetPeriod.startDate},data-end=${envelope.budgetPeriod.endDate},data-allocated=${envelope.allocatedAmount},data-spent=${envelope.spentAmount},data-remaining=${envelope.remainingAmount}">
+                    <div class="d-flex justify-content-between align-items-start gap-2">
+                        <div><strong class="d-block" th:text="${envelope.name}"></strong><span class="small text-muted" th:text="${envelope.category.name}"></span></div>
+                        <span class="small text-end text-nowrap"><span class="d-block text-muted">Hạn mức</span><strong th:text="${#numbers.formatDecimal(envelope.allocatedAmount, 0, 'COMMA', 0, 'POINT')} + ' ₫'"></strong></span>
+                    </div>
+                    <div class="progress my-2" style="height: 7px"><div class="progress-bar envelope-limit-progress" role="progressbar"></div></div>
+                    <div class="d-flex justify-content-between small text-muted"><span>Đã chi <span th:text="${#numbers.formatDecimal(envelope.spentAmount, 0, 'COMMA', 0, 'POINT')} + ' ₫'"></span></span><span>Còn <span th:text="${#numbers.formatDecimal(envelope.remainingAmount, 0, 'COMMA', 0, 'POINT')} + ' ₫'"></span></span></div>
+                    <div class="small mt-2 envelope-limit-preview" aria-live="polite"></div>
+                </article>
+            </div>
+        </aside>
+        </div>
+        <script>
+            (() => {
+                const type = document.getElementById('type'), category = document.getElementById('categoryId');
+                const amount = document.getElementById('amount'), transactionDate = document.getElementById('transactionDate');
+                const envelope = document.getElementById('envelopeId'), envelopeOptions = document.getElementById('envelopeOptions');
+                const envelopeSummary = document.getElementById('envelopeSummary'), fields = document.getElementById('expenseFields');
+                const limitItems = [...document.querySelectorAll('.envelope-limit-item')];
+                const limitEmpty = document.getElementById('envelopeLimitsEmpty');
+                const limitIncomeHint = document.getElementById('envelopeLimitIncomeHint');
+                const sourceEnvelope = document.getElementById('sourceEnvelopeId');
+                const sourceEnvelopeFields = document.getElementById('sourceEnvelopeFields');
+                const sourceEnvelopeLabel = document.getElementById('sourceEnvelopeLabel');
+                const otherExpenseHint = document.getElementById('otherExpenseHint');
+                const expenseType = document.getElementById('expenseType');
+                const budgetConfirmationHint = document.getElementById('budgetConfirmationHint');
+                const aiPrompt = document.getElementById('aiPrompt');
+                const receiptImage = document.getElementById('receiptImage');
+                const aiParseMessage = document.getElementById('aiParseMessage');
+                const csrfToken = document.querySelector('input[name="_csrf"]')?.value;
+                if (!type || !category) return;
+                const effortWarning = document.getElementById('effortWarning');
+                const effortPreviewHint = document.getElementById('effortPreviewHint');
+                const hourlyWageHint = document.getElementById('hourlyWageHint');
+                const hourlyWage = Number(effortWarning?.dataset.hourlyWage || 0);
+                const money = value => `${Math.max(0, Number(value) || 0).toLocaleString('vi-VN')} ₫`;
+                const updateEnvelopeLimitPanel = () => {
+                    const isIncome = type.value === 'INCOME';
+                    let visibleCount = 0;
+                    limitItems.forEach(item => {
+                        const inDateRange = !transactionDate.value
+                            || (transactionDate.value >= item.dataset.start && transactionDate.value <= item.dataset.end);
+                        item.hidden = isIncome || !inDateRange;
+                        item.classList.toggle('is-selected', !isIncome && item.dataset.envelopeId === envelope.value);
+                        if (item.hidden) return;
+                        visibleCount++;
+                        const allocated = Number(item.dataset.allocated || 0);
+                        const spent = Number(item.dataset.spent || 0);
+                        const remaining = Number(item.dataset.remaining || 0);
+                        const percent = allocated > 0 ? Math.min(100, spent / allocated * 100) : (spent > 0 ? 100 : 0);
+                        const progress = item.querySelector('.envelope-limit-progress');
+                        progress.style.width = `${percent}%`;
+                        progress.className = `progress-bar envelope-limit-progress ${remaining <= 0 ? 'bg-danger' : percent >= 80 ? 'bg-warning' : 'bg-success'}`;
+                        const preview = item.querySelector('.envelope-limit-preview');
+                        if (item.dataset.envelopeId === envelope.value && !isIncome && Number(amount.value) > 0) {
+                            const after = remaining - Number(amount.value);
+                            preview.className = `small mt-2 envelope-limit-preview ${after < 0 ? 'text-danger fw-semibold' : 'text-success'}`;
+                            preview.textContent = after < 0 ? `Thiếu ${money(-after)} — chọn phong bì khác để bù.` : `Sau giao dịch này còn ${money(after)}.`;
+                        } else {
+                            preview.textContent = '';
+                            preview.className = 'small mt-2 envelope-limit-preview';
+                        }
+                    });
+                    limitEmpty.classList.toggle('d-none', isIncome || visibleCount > 0);
+                    limitIncomeHint.classList.toggle('d-none', !isIncome);
+                };
+                const updateEffortWarning = () => {
+                    const selectedCategory = category.selectedOptions[0];
+                    const expenseSelected = type.value === 'EXPENSE' && category.value
+                        && selectedCategory?.dataset.type === 'EXPENSE';
+                    const value = Number(amount.value);
+                    const validAmount = Number.isFinite(value) && value > 0;
+                    const show = expenseSelected && validAmount;
+                    const canCalculate = show && hourlyWage > 0;
+                    effortWarning.classList.toggle('d-none', !show);
+                    effortPreviewHint.classList.toggle('d-none', show || type.value !== 'EXPENSE');
+                    hourlyWageHint.classList.toggle('d-none', !show || hourlyWage > 0);
+                    if (canCalculate) {
+                        const hours = (value / hourlyWage).toLocaleString('vi-VN', { maximumFractionDigits: 1 });
+                        const wage = hourlyWage.toLocaleString('vi-VN');
+                        const amountText = value.toLocaleString('vi-VN');
+                        effortWarning.textContent = `Khoản chi ${amountText} ₫ này tương đương khoảng ${hours} giờ làm theo mức thu nhập ${wage} ₫/giờ.`;
+                    } else if (show) {
+                        effortWarning.textContent = 'Đã chọn khoản chi. Cài thu nhập theo giờ để xem số giờ làm tương đương.';
+                    } else {
+                        effortWarning.textContent = '';
+                    }
+                };
+                const filter = () => {
+                    const dateMatches = option => !transactionDate.value
+                        || (transactionDate.value >= option.dataset.start && transactionDate.value <= option.dataset.end);
+                    const hasConfirmedBudget = [...envelopeOptions.options].some(o => o.value && dateMatches(o));
+                    expenseType.disabled = !hasConfirmedBudget;
+                    budgetConfirmationHint.classList.toggle('d-none', hasConfirmedBudget);
+                    if (!hasConfirmedBudget && type.value === 'EXPENSE') type.value = 'INCOME';
+                    const income = type.value === 'INCOME'; fields.hidden = income;
+                    const selectedCategory = category.selectedOptions[0];
+                    if (selectedCategory?.value && selectedCategory.dataset.type !== (income ? 'INCOME' : 'EXPENSE')) {
+                        category.value = '';
+                    }
+                    [...category.options].forEach(o => {
+                        if (!o.value) return;
+                        const correctType = o.dataset.type === (income ? 'INCOME' : 'EXPENSE');
+                        const hasEnvelope = [...envelopeOptions.options].some(e => e.value
+                            && e.dataset.category === o.value && dateMatches(e));
+                        o.hidden = !correctType || (!income && o.dataset.other !== 'true' && !hasEnvelope);
+                    });
+                    if (category.selectedOptions[0]?.hidden) category.value = '';
+                    const isOther = !income && category.selectedOptions[0]?.dataset.other === 'true';
+                    [...envelopeOptions.options].forEach(o => {
+                        if (!o.value) return;
+                        o.hidden = !dateMatches(o) || (!isOther && o.dataset.category !== category.value);
+                    });
+                    if (isOther || income) envelope.value = '';
+                    else if (![...envelopeOptions.options].some(o => o.value && o.value === envelope.value && !o.hidden)) {
+                        envelope.value = [...envelopeOptions.options].find(o => o.value && !o.hidden)?.value || '';
+                    }
+                    const selectedTarget = [...envelopeOptions.options].find(o => o.value && o.value === envelope.value);
+                    if (income) envelopeSummary.textContent = '';
+                    else if (isOther) envelopeSummary.textContent = 'Mục khác: chọn phong bì chi trả bên dưới.';
+                    else if (selectedTarget) envelopeSummary.textContent = `Phong bì tự chọn: ${selectedTarget.textContent.trim()}`;
+                    else envelopeSummary.textContent = 'Danh mục này chưa có phong bì trong kỳ đã xác nhận.';
+                    sourceEnvelopeLabel.textContent = isOther ? 'Phong bì bù (bắt buộc)' : 'Phong bì nguồn bù (nếu cần)';
+                    sourceEnvelope.required = !income && isOther;
+                    otherExpenseHint.classList.toggle('d-none', !isOther);
+                    const targetNeedsCover = envelope.value && Number(amount.value) > Number(selectedTarget?.dataset.remaining || 0);
+                    sourceEnvelopeFields.classList.toggle('d-none', income || (!isOther && !targetNeedsCover));
+                    const requiredSourceAmount = isOther ? Number(amount.value)
+                        : (targetNeedsCover ? Number(amount.value) - Number(selectedTarget.dataset.remaining) : 0);
+                    [...sourceEnvelope.options].forEach(o => {
+                        if (!o.value) return;
+                        const sameBudget = isOther || !selectedTarget?.value || o.dataset.budget === selectedTarget.dataset.budget;
+                        const notTarget = isOther || o.value !== envelope.value;
+                        const enoughBalance = Number(o.dataset.remaining || 0) >= requiredSourceAmount;
+                        o.hidden = !dateMatches(o) || !sameBudget || !notTarget || !enoughBalance;
+                    });
+                    if (sourceEnvelope.selectedOptions[0]?.hidden) sourceEnvelope.value = '';
+                    sourceEnvelope.required = !income && (isOther || targetNeedsCover);
+                    if (income) { envelope.value = ''; sourceEnvelope.value = ''; }
+                    updateEnvelopeLimitPanel();
+                    updateEffortWarning();
+                };
+                const applyAIDraft = draft => {
+                    if (draft.suggestedType) type.value = draft.suggestedType;
+                    if (draft.suggestedAmount != null) amount.value = draft.suggestedAmount;
+                    if (draft.transactionDate) transactionDate.value = draft.transactionDate;
+                    if (draft.note) document.getElementById('note').value = draft.note;
+                    if (draft.suggestedCategory) {
+                        const option = [...category.options].find(o => o.value && o.textContent.trim() === draft.suggestedCategory);
+                        if (option) category.value = option.value;
+                    }
+                    filter();
+                    aiParseMessage.textContent = `${draft.message || 'Đã điền bản nháp.'}${draft.confidence != null ? ` Độ tin cậy: ${Math.round(Number(draft.confidence) * 100)}%.` : ''}`;
+                    aiParseMessage.className = 'form-text mt-2 text-success';
+                };
+                document.getElementById('aiParseButton').addEventListener('click', async event => {
+                    if (!aiPrompt.value.trim()) { aiParseMessage.textContent = 'Hãy nhập câu mô tả giao dịch.'; return; }
+                    const button = event.currentTarget; button.disabled = true; aiParseMessage.textContent = 'Đang phân tích câu mô tả…';
+                    try {
+                        const response = await fetch('/api/ai/parse', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken }, body: JSON.stringify({ rawPrompt: aiPrompt.value.trim() }) });
+                        const draft = await response.json(); if (!response.ok) throw new Error(draft.message || 'Không phân tích được nội dung.'); applyAIDraft(draft);
+                    } catch (error) { aiParseMessage.textContent = error.message; aiParseMessage.className = 'form-text mt-2 text-danger'; }
+                    finally { button.disabled = false; }
+                });
+                document.getElementById('receiptParseButton').addEventListener('click', async event => {
+                    if (!receiptImage.files.length) { aiParseMessage.textContent = 'Hãy chọn ảnh hóa đơn trước.'; return; }
+                    const button = event.currentTarget; button.disabled = true; aiParseMessage.textContent = 'Đang đọc hóa đơn…';
+                    try {
+                        const formData = new FormData(); formData.append('image', receiptImage.files[0]); formData.append('_csrf', csrfToken || '');
+                        const response = await fetch('/api/ai/receipt', { method: 'POST', body: formData });
+                        const draft = await response.json(); if (!response.ok) throw new Error(draft.message || 'Không đọc được ảnh hóa đơn.'); applyAIDraft(draft);
+                    } catch (error) { aiParseMessage.textContent = error.message; aiParseMessage.className = 'form-text mt-2 text-danger'; }
+                    finally { button.disabled = false; }
+                });
+                type.addEventListener('change', filter); category.addEventListener('change', filter);
+                transactionDate.addEventListener('change', filter);
+                amount.addEventListener('input', () => { filter(); updateEffortWarning(); });
+                sourceEnvelope.addEventListener('change', filter); filter();
+            })();
+        </script>
+    </main>
+</div>
+<div th:replace="~{fragments/footer :: footer}"></div><th:block th:replace="~{fragments/resources :: scripts}"></th:block>
+</body>
+</html>
